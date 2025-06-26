@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Palestine Profile Maker - FalasTech</title>
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="FalasTech - Personalize & Support with Country Flags 🇵🇸">
+  <meta name="description"
+    content="Create custom profile images with your chosen flag and frames to show solidarity with Palestine and countries around the world.">
+  <meta name="keywords"
+    content="FalasTech, Palestine, profile picture maker, country flags, solidarity, Free Palestine, digital activism, tech for justice, open-source">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="FalasTech">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://falastech.org/">
+  <meta property="og:title" content="FalasTech - Personalize Your Profile with Country Flags">
+  <meta property="og:description"
+    content="Stand in solidarity with Palestine and other countries worldwide. Personalize your profile image with frames and flags — powered by FalasTech.">
+  <meta property="og:image" content="https://falastech.org/assets/preview-profile-maker.jpg">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://falastech.org/">
+  <meta name="twitter:title" content="FalasTech - Personalize Your Profile with Country Flags">
+  <meta name="twitter:description"
+    content="Show your solidarity for Palestine and any other country with custom frames and flags — created by FalasTech’s open-source tools.">
+  <meta name="twitter:image" content="https://falastech.org/assets/preview-profile-maker.jpg">
+
+  <!-- Favicon -->
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    canvas {
+      cursor: move;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .icon-transition {
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen font-sans">
+  <div class="max-w-xl mx-auto p-4">
+    <div class="flex justify-between items-center mb-4">
+      <button id="themeButton"
+        class="text-sm px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 dark:text-white flex items-center gap-2">
+        <i id="themeIcon" data-lucide="sun" class="w-5 h-5 icon-transition"></i>
+      </button>
+      <button id="previewButton" class="text-sm px-3 py-1 rounded bg-purple-600 text-white flex items-center gap-2">
+        <i data-lucide="eye" class="w-5 h-5"></i> Preview
+      </button>
+    </div>
+
+    <div id="browserWarning"
+      class="hidden bg-red-100 text-red-700 p-2 mb-4 rounded font-medium text-sm text-center dark:bg-red-800 dark:text-white">
+      ⚠️ Unsupported Browser Detected. Please open this page in your default browser for best experience.
+    </div>
+
+    <h1 class="text-3xl font-extrabold mb-2 text-center">Raise Your Voice <span
+        class="text-gray-400 text-xl">🇵🇸</span></h1>
+    <p class="mb-4 text-center text-gray-600 dark:text-gray-300">Let’s stand as one by reflecting the cause in our
+      profile pictures. ✊</p>
+    <div class="flex justify-center mb-4">
+      <canvas id="canvas" width="300" height="300"
+        class="rounded-full border-4 border-gray-300 dark:border-gray-600 shadow-md"></canvas>
+    </div>
+    <div id="inputSection">
+      <div class="flex justify-center mb-4">
+        <label for="upload"
+          class="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 text-white cursor-pointer hover:bg-blue-700">
+          <i data-lucide="image" class="w-5 h-5"></i> Upload Image
+        </label>
+        <input type="file" id="upload" accept="image/*" class="hidden" />
+      </div>
+      <div class="flex flex-wrap gap-2 justify-center mb-4">
+        <button onClick="fetchAvatar('x')" class="px-4 py-2 rounded bg-black text-white hover:bg-gray-800"><img
+            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" class="inline h-5 w-5 mr-1 filter invert"> X
+          (Twitter)</button>
+        <button onClick="fetchAvatar('github')" class="px-4 py-2 rounded bg-gray-800 text-white hover:bg-gray-700"><img
+            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg"
+            class="inline h-5 w-5 mr-1 filter invert"> GitHub</button>
+        <button onClick="fetchAvatar('gitlab')" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"><img
+            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gitlab.svg"
+            class="inline h-5 w-5 mr-1 filter invert"> GitLab</button>
+      </div>
+      <div class="mb-6">
+        <label class="block text-sm font-medium mb-1">Select Frame</label>
+        <select id="frameSelect" onchange="changeFrame()"
+          class="w-full px-4 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-600">
+          <option value="bg.webp">🖼️ Default Frame</option>
+          <option value="bg-country.webp">🎌 With Your Country Flag</option>
+          <option value="bg-freepalestine.webp">🍉 #FreePalestine Overlay</option>
+        </select>
+      </div>
+
+      <!-- COUNTRY SELECTION (initially hidden) -->
+      <div id="countrySelectorContainer" class="mb-4 hidden">
+        <label class="block text-sm font-medium mb-1">Select Country</label>
+        <select id="countrySelect"
+          class="w-full px-4 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-600">
+          <option value="">Choose a Country</option>
+          <option value="afghanistan">🇦🇫 Afghanistan</option>
+          <option value="albania">🇦🇱 Albania</option>
+          <option value="algeria">🇩🇿 Algeria</option>
+          <option value="andorra">🇦🇩 Andorra</option>
+          <option value="angola">🇦🇴 Angola</option>
+          <option value="argentina">🇦🇷 Argentina</option>
+          <option value="armenia">🇦🇲 Armenia</option>
+          <option value="australia">🇦🇺 Australia</option>
+          <option value="austria">🇦🇹 Austria</option>
+          <option value="azerbaijan">🇦🇿 Azerbaijan</option>
+          <option value="bahamas">🇧🇸 Bahamas</option>
+          <option value="bahrain">🇧🇭 Bahrain</option>
+          <option value="bangladesh">🇧🇩 Bangladesh</option>
+          <option value="barbados">🇧🇧 Barbados</option>
+          <option value="belarus">🇧🇾 Belarus</option>
+          <option value="belgium">🇧🇪 Belgium</option>
+          <option value="belize">🇧🇿 Belize</option>
+          <option value="benin">🇧🇯 Benin</option>
+          <option value="bhutan">🇧🇹 Bhutan</option>
+          <option value="bolivia">🇧🇴 Bolivia</option>
+          <option value="bosnia-and-herzegovina">🇧🇦 Bosnia and Herzegovina</option>
+          <option value="botswana">🇧🇼 Botswana</option>
+          <option value="brazil">🇧🇷 Brazil</option>
+          <option value="brunei">🇧🇳 Brunei</option>
+          <option value="bulgaria">🇧🇬 Bulgaria</option>
+          <option value="burkina-faso">🇧🇫 Burkina Faso</option>
+          <option value="burundi">🇧🇮 Burundi</option>
+          <option value="cambodia">🇰🇭 Cambodia</option>
+          <option value="cameroon">🇨🇲 Cameroon</option>
+          <option value="canada">🇨🇦 Canada</option>
+          <option value="cape-verde">🇨🇻 Cape Verde</option>
+          <option value="central-african-republic">🇨🇫 Central African Republic</option>
+          <option value="chad">🇹🇩 Chad</option>
+          <option value="chile">🇨🇱 Chile</option>
+          <option value="china">🇨🇳 China</option>
+          <option value="colombia">🇨🇴 Colombia</option>
+          <option value="comoros">🇰🇲 Comoros</option>
+          <option value="congo">🇨🇬 Congo</option>
+          <option value="costa-rica">🇨🇷 Costa Rica</option>
+          <option value="croatia">🇭🇷 Croatia</option>
+          <option value="cuba">🇨🇺 Cuba</option>
+          <option value="cyprus">🇨🇾 Cyprus</option>
+          <option value="czech-republic">🇨🇿 Czech Republic</option>
+          <option value="denmark">🇩🇰 Denmark</option>
+          <option value="djibouti">🇩🇯 Djibouti</option>
+          <option value="dominica">🇩🇲 Dominica</option>
+          <option value="dominican-republic">🇩🇴 Dominican Republic</option>
+          <option value="ecuador">🇪🇨 Ecuador</option>
+          <option value="egypt">🇪🇬 Egypt</option>
+          <option value="el-salvador">🇸🇻 El Salvador</option>
+          <option value="equatorial-guinea">🇬🇶 Equatorial Guinea</option>
+          <option value="eritrea">🇪🇷 Eritrea</option>
+          <option value="estonia">🇪🇪 Estonia</option>
+          <option value="eswatini">🇸🇿 Eswatini</option>
+          <option value="ethiopia">🇪🇹 Ethiopia</option>
+          <option value="fiji">🇫🇯 Fiji</option>
+          <option value="finland">🇫🇮 Finland</option>
+          <option value="france">🇫🇷 France</option>
+          <option value="gabon">🇬🇦 Gabon</option>
+          <option value="gambia">🇬🇲 Gambia</option>
+          <option value="georgia">🇬🇪 Georgia</option>
+          <option value="germany">🇩🇪 Germany</option>
+          <option value="ghana">🇬🇭 Ghana</option>
+          <option value="greece">🇬🇷 Greece</option>
+          <option value="grenada">🇬🇩 Grenada</option>
+          <option value="guatemala">🇬🇹 Guatemala</option>
+          <option value="guinea">🇬🇳 Guinea</option>
+          <option value="guinea-bissau">🇬🇼 Guinea-Bissau</option>
+          <option value="guyana">🇬🇾 Guyana</option>
+          <option value="haiti">🇭🇹 Haiti</option>
+          <option value="honduras">🇭🇳 Honduras</option>
+          <option value="hungary">🇭🇺 Hungary</option>
+          <option value="iceland">🇮🇸 Iceland</option>
+          <option value="india">🇮🇳 India</option>
+          <option value="indonesia">🇮🇩 Indonesia</option>
+          <option value="iran">🇮🇷 Iran</option>
+          <option value="iraq">🇮🇶 Iraq</option>
+          <option value="ireland">🇮🇪 Ireland</option>
+          <option value="israel">🇮🇱 Israel</option>
+          <option value="italy">🇮🇹 Italy</option>
+          <option value="jamaica">🇯🇲 Jamaica</option>
+          <option value="japan">🇯🇵 Japan</option>
+          <option value="jordan">🇯🇴 Jordan</option>
+          <option value="kazakhstan">🇰🇿 Kazakhstan</option>
+          <option value="kenya">🇰🇪 Kenya</option>
+          <option value="kiribati">🇰🇮 Kiribati</option>
+          <option value="kosovo">🇽🇰 Kosovo</option>
+          <option value="kuwait">🇰🇼 Kuwait</option>
+          <option value="kyrgyzstan">🇰🇬 Kyrgyzstan</option>
+          <option value="laos">🇱🇦 Laos</option>
+          <option value="latvia">🇱🇻 Latvia</option>
+          <option value="lebanon">🇱🇧 Lebanon</option>
+          <option value="lesotho">🇱🇸 Lesotho</option>
+          <option value="liberia">🇱🇷 Liberia</option>
+          <option value="libya">🇱🇾 Libya</option>
+          <option value="liechtenstein">🇱🇮 Liechtenstein</option>
+          <option value="lithuania">🇱🇹 Lithuania</option>
+          <option value="luxembourg">🇱🇺 Luxembourg</option>
+          <option value="madagascar">🇲🇬 Madagascar</option>
+          <option value="malawi">🇲🇼 Malawi</option>
+          <option value="malaysia">🇲🇾 Malaysia</option>
+          <option value="maldives">🇲🇻 Maldives</option>
+          <option value="mali">🇲🇱 Mali</option>
+          <option value="malta">🇲🇹 Malta</option>
+          <option value="marshall-islands">🇲🇭 Marshall Islands</option>
+          <option value="mauritania">🇲🇷 Mauritania</option>
+          <option value="mauritius">🇲🇺 Mauritius</option>
+          <option value="mexico">🇲🇽 Mexico</option>
+          <option value="micronesia">🇫🇲 Micronesia</option>
+          <option value="moldova">🇲🇩 Moldova</option>
+          <option value="monaco">🇲🇨 Monaco</option>
+          <option value="mongolia">🇲🇳 Mongolia</option>
+          <option value="montenegro">🇲🇪 Montenegro</option>
+          <option value="morocco">🇲🇦 Morocco</option>
+          <option value="mozambique">🇲🇿 Mozambique</option>
+          <option value="myanmar">🇲🇲 Myanmar</option>
+          <option value="namibia">🇳🇦 Namibia</option>
+          <option value="nauru">🇳🇷 Nauru</option>
+          <option value="nepal">🇳🇵 Nepal</option>
+          <option value="netherlands">🇳🇱 Netherlands</option>
+          <option value="new-zealand">🇳🇿 New Zealand</option>
+          <option value="nicaragua">🇳🇮 Nicaragua</option>
+          <option value="niger">🇳🇪 Niger</option>
+          <option value="nigeria">🇳🇬 Nigeria</option>
+          <option value="north-korea">🇰🇵 North Korea</option>
+          <option value="north-macedonia">🇲🇰 North Macedonia</option>
+          <option value="norway">🇳🇴 Norway</option>
+          <option value="oman">🇴🇲 Oman</option>
+          <option value="pakistan">🇵🇰 Pakistan</option>
+          <option value="palau">🇵🇼 Palau</option>
+          <option value="palestine">🇵🇸 Palestine</option>
+          <option value="panama">🇵🇦 Panama</option>
+          <option value="papua-new-guinea">🇵🇬 Papua New Guinea</option>
+          <option value="paraguay">🇵🇾 Paraguay</option>
+          <option value="peru">🇵🇪 Peru</option>
+          <option value="philippines">🇵🇭 Philippines</option>
+          <option value="poland">🇵🇱 Poland</option>
+          <option value="portugal">🇵🇹 Portugal</option>
+          <option value="qatar">🇶🇦 Qatar</option>
+          <option value="romania">🇷🇴 Romania</option>
+          <option value="russia">🇷🇺 Russia</option>
+          <option value="rwanda">🇷🇼 Rwanda</option>
+          <option value="saint-kitts-and-nevis">🇰🇳 Saint Kitts and Nevis</option>
+          <option value="saint-lucia">🇱🇨 Saint Lucia</option>
+          <option value="saint-vincent-and-the-grenadines">🇻🇨 Saint Vincent and the Grenadines</option>
+          <option value="samoa">🇼🇸 Samoa</option>
+          <option value="san-marino">🇸🇲 San Marino</option>
+          <option value="sao-tome-and-principe">🇸🇹 São Tomé and Príncipe</option>
+          <option value="saudi-arabia">🇸🇦 Saudi Arabia</option>
+          <option value="senegal">🇸🇳 Senegal</option>
+          <option value="serbia">🇷🇸 Serbia</option>
+          <option value="seychelles">🇸🇨 Seychelles</option>
+          <option value="sierra-leone">🇸🇱 Sierra Leone</option>
+          <option value="singapore">🇸🇬 Singapore</option>
+          <option value="slovakia">🇸🇰 Slovakia</option>
+          <option value="slovenia">🇸🇮 Slovenia</option>
+          <option value="solomon-islands">🇸🇧 Solomon Islands</option>
+          <option value="somalia">🇸🇴 Somalia</option>
+          <option value="south-africa">🇿🇦 South Africa</option>
+          <option value="south-korea">🇰🇷 South Korea</option>
+          <option value="south-sudan">🇸🇸 South Sudan</option>
+          <option value="spain">🇪🇸 Spain</option>
+          <option value="sri-lanka">🇱🇰 Sri Lanka</option>
+          <option value="sudan">🇸🇩 Sudan</option>
+          <option value="suriname">🇸🇷 Suriname</option>
+          <option value="sweden">🇸🇪 Sweden</option>
+          <option value="switzerland">🇨🇭 Switzerland</option>
+          <option value="syria">🇸🇾 Syria</option>
+          <option value="taiwan">🇹🇼 Taiwan</option>
+          <option value="tajikistan">🇹🇯 Tajikistan</option>
+          <option value="tanzania">🇹🇿 Tanzania</option>
+          <option value="thailand">🇹🇭 Thailand</option>
+          <option value="togo">🇹🇬 Togo</option>
+          <option value="tonga">🇹🇴 Tonga</option>
+          <option value="trinidad-and-tobago">🇹🇹 Trinidad and Tobago</option>
+          <option value="tunisia">🇹🇳 Tunisia</option>
+          <option value="turkey">🇹🇷 Turkey</option>
+          <option value="turkmenistan">🇹🇲 Turkmenistan</option>
+          <option value="tuvalu">🇹🇻 Tuvalu</option>
+          <option value="uganda">🇺🇬 Uganda</option>
+          <option value="ukraine">🇺🇦 Ukraine</option>
+          <option value="united-arab-emirates">🇦🇪 United Arab Emirates</option>
+          <option value="united-kingdom">🇬🇧 United Kingdom</option>
+          <option value="united-states">🇺🇸 United States</option>
+          <option value="uruguay">🇺🇾 Uruguay</option>
+          <option value="uzbekistan">🇺🇿 Uzbekistan</option>
+          <option value="vanuatu">🇻🇺 Vanuatu</option>
+          <option value="vatican-city">🇻🇦 Vatican City</option>
+          <option value="venezuela">🇻🇪 Venezuela</option>
+          <option value="vietnam">🇻🇳 Vietnam</option>
+          <option value="yemen">🇾🇪 Yemen</option>
+          <option value="zambia">🇿🇲 Zambia</option>
+          <option value="zimbabwe">🇿🇼 Zimbabwe</option>
+        </select>
+      </div>
+
+
+    </div>
+    <div id="finalButtons" class="space-y-2 hidden">
+      <button id="downloadBtn"
+        class="w-full px-5 py-2 rounded-full bg-green-600 text-white hover:bg-green-700 shadow">Download Image</button>
+      <button id="backEditBtn"
+        class="w-full px-5 py-2 rounded-full bg-gray-500 text-white hover:bg-gray-600 shadow">Back to Edit</button>
+      <button id="startOverBtn"
+        class="w-full px-5 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 shadow">Start Over</button>
+    </div>
+    <p class="text-xs mt-4 text-gray-400 dark:text-gray-500 text-center">Note: This tool works entirely in your browser.
+      We don’t store or share your data.</p>
+  </div>
+
+  <dialog id="editorModal" class="p-4 bg-white dark:bg-gray-800 rounded shadow-md w-[340px]">
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Edit Your Image</h2>
+    <canvas id="editCanvas" width="300" height="300" class="rounded-full border mb-4 shadow"></canvas>
+    <div class="flex justify-center items-center gap-4 mb-4">
+      <button id="zoomInBtn" title="Zoom In" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><i
+          data-lucide="zoom-in" class="w-5 h-5 text-gray-700 dark:text-gray-200"></i></button>
+      <button id="zoomOutBtn" title="Zoom Out" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><i
+          data-lucide="zoom-out" class="w-5 h-5 text-gray-700 dark:text-gray-200"></i></button>
+      <button id="rotateBtn" title="Rotate" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><i
+          data-lucide="rotate-ccw" class="w-5 h-5 text-gray-700 dark:text-gray-200"></i></button>
+      <button id="resetBtn" title="Reset" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><i
+          data-lucide="refresh-ccw" class="w-5 h-5 text-gray-700 dark:text-gray-200"></i></button>
+    </div>
+    <div class="text-center">
+      <button id="applyBtn" title="Done Editing" class="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"><i
+          data-lucide="check" class="w-5 h-5"></i></button>
+    </div>
+  </dialog>
+
+  <script>
+    let userImg = new Image();
+    userImg.crossOrigin = "anonymous";
+
+    let frame = new Image();
+    let currentFrame = "default";
+    let framePaths = {
+      default: "frames/bg.webp",
+      flag: "frames/bg-country.webp",
+      freepalestine: "frames/bg-freepalestine.webp"
+    };
+    let flagImg = new Image();
+    flagImg.crossOrigin = "anonymous";
+
+    let selectedCountry = null;
+
+    let imgX = 150, imgY = 150, isDragging = false, startX, startY;
+    let scale = 1, rotation = 0;
+
+    const html = document.documentElement;
+
+    function toggleDarkMode() {
+      html.classList.toggle("dark");
+      const icon = document.getElementById("themeIcon");
+      icon.setAttribute("data-lucide", html.classList.contains("dark") ? "moon" : "sun");
+      lucide.createIcons();
+    }
+
+    function setFrame(type) {
+      currentFrame = type;
+      frame.crossOrigin = "anonymous";
+      frame.src = framePaths[type];
+      frame.onload = () => {
+        drawEditCanvas();
+        drawMainCanvas();
+      };
+    }
+
+    function drawCanvas(context, image) {
+      context.clearRect(0, 0, 300, 300);
+      // Always draw the frame
+      if (frame && frame.complete) {
+        context.drawImage(frame, 0, 0, 300, 300);
+      }
+
+      // Draw user image only if it's valid
+      if (image && image.complete && image.naturalWidth > 0) {
+        context.save();
+        context.beginPath();
+        context.arc(150, 150, 130, 0, Math.PI * 2);
+        context.closePath();
+        context.clip();
+        context.translate(150, 150);
+        context.rotate(rotation);
+        const size = 300 * scale;
+        context.drawImage(image, -size / 2 + (imgX - 150), -size / 2 + (imgY - 150), size, size);
+        context.restore();
+      }
+
+      // Draw selected flag if available
+      if (currentFrame === "flag" && selectedFlag && selectedFlag.complete) {
+        const canvasSize = 300;
+
+        // Flag size and position
+        const targetHeight = 32;
+        const targetWidth = targetHeight * 1.5; // 3:2 aspect ratio
+        const x = (canvasSize - targetWidth) / 2;
+        const y = canvasSize - targetHeight - 30;
+        const radius = 6;
+
+        const ctx = context; // alias for clarity
+
+        // Drop shadow
+        ctx.save();
+        ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 4;
+
+        // Clip to rounded rectangle
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + targetWidth - radius, y);
+        ctx.quadraticCurveTo(x + targetWidth, y, x + targetWidth, y + radius);
+        ctx.lineTo(x + targetWidth, y + targetHeight - radius);
+        ctx.quadraticCurveTo(x + targetWidth, y + targetHeight, x + targetWidth - radius, y + targetHeight);
+        ctx.lineTo(x + radius, y + targetHeight);
+        ctx.quadraticCurveTo(x, y + targetHeight, x, y + targetHeight - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.clip();
+
+        // Draw flag
+        ctx.drawImage(selectedFlag, x, y, targetWidth, targetHeight);
+        ctx.restore();
+      }
+
+      if (currentFrame === "freepalestine") {
+        // Draw the frame overlay on top of the user image
+        if (frame && frame.complete) {
+          context.drawImage(frame, 0, 0, 300, 300);
+        }
+      }
+    }
+
+    function drawMainCanvas() {
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.style.opacity = 0.5;
+      drawCanvas(ctx, userImg);
+      setTimeout(() => (canvas.style.opacity = 1), 100);
+    }
+
+    function drawEditCanvas() {
+      const editCanvas = document.getElementById("editCanvas");
+      const ctx = editCanvas.getContext("2d");
+      drawCanvas(ctx, userImg);
+    }
+
+    function resetImage() {
+      scale = 1;
+      rotation = 0;
+      imgX = 150;
+      imgY = 150;
+      drawEditCanvas();
+    }
+
+    function applyChanges() {
+      drawMainCanvas();
+      editorModal.close();
+      showOutputUI();
+    }
+
+    function showOutputUI() {
+      document.getElementById('inputSection').style.display = 'none';
+      document.getElementById('finalButtons').classList.remove('hidden');
+    }
+
+    function startOver() {
+      location.reload();
+    }
+
+    function backToEdit() {
+      editorModal.showModal();
+      document.getElementById("finalButtons").classList.add("hidden");
+      drawEditCanvas();
+    }
+
+    function downloadImage() {
+      const link = document.createElement("a");
+      link.download = "solidarity-profile.png";
+      link.href = document.getElementById("canvas").toDataURL("image/png");
+      link.click();
+    }
+
+    async function fetchAvatar(platform) {
+      const username = prompt("Enter your " + platform + " username:");
+      if (!username) return;
+      try {
+        const url = `https://unavatar.io/${platform}/${username}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Avatar not found");
+        loadImage(url);
+      } catch (err) {
+        alert("Failed to fetch avatar from " + platform + ". Try again later.");
+      }
+    }
+
+    function loadImage(src) {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        userImg = img;
+        resetImage();
+        drawEditCanvas();
+        editorModal.showModal();
+      };
+      img.onerror = () => {
+        alert("Unable to load the uploaded image.");
+      };
+      img.src = src;
+    }
+
+    function zoom(factor) {
+      scale *= factor;
+      drawEditCanvas();
+    }
+
+    function rotateImage() {
+      rotation += Math.PI / 8;
+      drawEditCanvas();
+    }
+
+    function loadFlagImage() {
+      if (!selectedCountry) return;
+
+      const code = {
+        palestine: "ps",
+        india: "in",
+        usa: "us",
+        egypt: "eg"
+      }[selectedCountry];
+
+      if (!code) return;
+
+      flagImg = new Image();
+      flagImg.crossOrigin = "anonymous";
+      flagImg.src = `https://flagcdn.com/w40/${code}.png`;
+
+      flagImg.onload = () => {
+        drawEditCanvas();
+        drawMainCanvas();
+      };
+    }
+
+    function changeFrame() {
+      const selectedValue = document.getElementById("frameSelect").value;
+
+      if (selectedValue === "bg-country.webp") {
+        setFrame("flag");
+        document.getElementById("countrySelectorContainer").classList.remove("hidden");
+
+      } else if (selectedValue === "bg-freepalestine.webp") {
+        setFrame("freepalestine");
+        document.getElementById("countrySelectorContainer").classList.add("hidden");
+        selectedFlag = null; // Clear any loaded flag
+        drawMainCanvas();    // Redraw canvas without flag
+
+      } else {
+        setFrame("default");
+        document.getElementById("countrySelectorContainer").classList.add("hidden");
+        selectedFlag = null;
+        drawMainCanvas();
+      }
+    }
+
+    // Event Listeners
+    const upload = document.getElementById("upload");
+    upload.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const img = new Image();
+      img.onload = () => {
+        userImg = img;
+        resetImage();
+        drawEditCanvas();
+        editorModal.showModal();
+      };
+      img.src = URL.createObjectURL(file);
+    });
+
+    const countrySelect = document.getElementById("countrySelect");
+    countrySelect.addEventListener("change", (e) => {
+      loadFlag(e.target.value);
+    });
+
+    const editCanvas = document.getElementById("editCanvas");
+
+    function handleDragStart(x, y) {
+      startX = x;
+      startY = y;
+      isDragging = true;
+    }
+
+    function handleDragMove(x, y) {
+      if (!isDragging || !userImg) return;
+
+      const dx = x - startX;
+      const dy = y - startY;
+
+      imgX = Math.min(Math.max(imgX + dx, 50), 250);
+      imgY = Math.min(Math.max(imgY + dy, 50), 250);
+
+      startX = x;
+      startY = y;
+      drawEditCanvas();
+    }
+
+    editCanvas.addEventListener("mousedown", (e) => {
+      handleDragStart(e.offsetX, e.offsetY);
+    });
+    editCanvas.addEventListener("mousemove", (e) => {
+      handleDragMove(e.offsetX, e.offsetY);
+    });
+    editCanvas.addEventListener("mouseup", () => isDragging = false);
+    editCanvas.addEventListener("mouseleave", () => isDragging = false);
+
+    editCanvas.addEventListener("touchstart", (e) => {
+      const touch = e.touches[0];
+      const rect = editCanvas.getBoundingClientRect();
+      handleDragStart(touch.clientX - rect.left, touch.clientY - rect.top);
+    });
+    editCanvas.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const rect = editCanvas.getBoundingClientRect();
+      handleDragMove(touch.clientX - rect.left, touch.clientY - rect.top);
+    });
+    editCanvas.addEventListener("touchend", () => isDragging = false);
+
+    // Buttons
+    document.getElementById("themeButton").addEventListener("click", toggleDarkMode);
+    document.getElementById("previewButton").addEventListener("click", drawMainCanvas);
+    document.getElementById("zoomInBtn").addEventListener("click", () => zoom(1.1));
+    document.getElementById("zoomOutBtn").addEventListener("click", () => zoom(0.9));
+    document.getElementById("rotateBtn").addEventListener("click", rotateImage);
+    document.getElementById("resetBtn").addEventListener("click", resetImage);
+    document.getElementById("applyBtn").addEventListener("click", applyChanges);
+    document.getElementById("downloadBtn").addEventListener("click", downloadImage);
+    document.getElementById("backEditBtn").addEventListener("click", backToEdit);
+    document.getElementById("startOverBtn").addEventListener("click", startOver);
+
+    // Country Selection
+    // Country Selection
+    const flagPaths = {
+      "afghanistan": "https://flagcdn.com/w40/af.png",
+      "albania": "https://flagcdn.com/w40/al.png",
+      "algeria": "https://flagcdn.com/w40/dz.png",
+      "andorra": "https://flagcdn.com/w40/ad.png",
+      "angola": "https://flagcdn.com/w40/ao.png",
+      "argentina": "https://flagcdn.com/w40/ar.png",
+      "armenia": "https://flagcdn.com/w40/am.png",
+      "australia": "https://flagcdn.com/w40/au.png",
+      "austria": "https://flagcdn.com/w40/at.png",
+      "azerbaijan": "https://flagcdn.com/w40/az.png",
+      "bahamas": "https://flagcdn.com/w40/bs.png",
+      "bahrain": "https://flagcdn.com/w40/bh.png",
+      "bangladesh": "https://flagcdn.com/w40/bd.png",
+      "belarus": "https://flagcdn.com/w40/by.png",
+      "belgium": "https://flagcdn.com/w40/be.png",
+      "belize": "https://flagcdn.com/w40/bz.png",
+      "benin": "https://flagcdn.com/w40/bj.png",
+      "bhutan": "https://flagcdn.com/w40/bt.png",
+      "bolivia": "https://flagcdn.com/w40/bo.png",
+      "bosnia": "https://flagcdn.com/w40/ba.png",
+      "botswana": "https://flagcdn.com/w40/bw.png",
+      "brazil": "https://flagcdn.com/w40/br.png",
+      "brunei": "https://flagcdn.com/w40/bn.png",
+      "bulgaria": "https://flagcdn.com/w40/bg.png",
+      "burkinafaso": "https://flagcdn.com/w40/bf.png",
+      "burundi": "https://flagcdn.com/w40/bi.png",
+      "cambodia": "https://flagcdn.com/w40/kh.png",
+      "cameroon": "https://flagcdn.com/w40/cm.png",
+      "canada": "https://flagcdn.com/w40/ca.png",
+      "chad": "https://flagcdn.com/w40/td.png",
+      "chile": "https://flagcdn.com/w40/cl.png",
+      "china": "https://flagcdn.com/w40/cn.png",
+      "colombia": "https://flagcdn.com/w40/co.png",
+      "comoros": "https://flagcdn.com/w40/km.png",
+      "congo": "https://flagcdn.com/w40/cg.png",
+      "costarica": "https://flagcdn.com/w40/cr.png",
+      "croatia": "https://flagcdn.com/w40/hr.png",
+      "cuba": "https://flagcdn.com/w40/cu.png",
+      "cyprus": "https://flagcdn.com/w40/cy.png",
+      "czechia": "https://flagcdn.com/w40/cz.png",
+      "denmark": "https://flagcdn.com/w40/dk.png",
+      "djibouti": "https://flagcdn.com/w40/dj.png",
+      "dominica": "https://flagcdn.com/w40/dm.png",
+      "dominicanrepublic": "https://flagcdn.com/w40/do.png",
+      "ecuador": "https://flagcdn.com/w40/ec.png",
+      "egypt": "https://flagcdn.com/w40/eg.png",
+      "elsalvador": "https://flagcdn.com/w40/sv.png",
+      "estonia": "https://flagcdn.com/w40/ee.png",
+      "eswatini": "https://flagcdn.com/w40/sz.png",
+      "ethiopia": "https://flagcdn.com/w40/et.png",
+      "finland": "https://flagcdn.com/w40/fi.png",
+      "france": "https://flagcdn.com/w40/fr.png",
+      "gabon": "https://flagcdn.com/w40/ga.png",
+      "gambia": "https://flagcdn.com/w40/gm.png",
+      "georgia": "https://flagcdn.com/w40/ge.png",
+      "germany": "https://flagcdn.com/w40/de.png",
+      "ghana": "https://flagcdn.com/w40/gh.png",
+      "greece": "https://flagcdn.com/w40/gr.png",
+      "grenada": "https://flagcdn.com/w40/gd.png",
+      "guatemala": "https://flagcdn.com/w40/gt.png",
+      "guinea": "https://flagcdn.com/w40/gn.png",
+      "guyana": "https://flagcdn.com/w40/gy.png",
+      "haiti": "https://flagcdn.com/w40/ht.png",
+      "honduras": "https://flagcdn.com/w40/hn.png",
+      "hungary": "https://flagcdn.com/w40/hu.png",
+      "iceland": "https://flagcdn.com/w40/is.png",
+      "india": "https://flagcdn.com/w40/in.png",
+      "indonesia": "https://flagcdn.com/w40/id.png",
+      "iran": "https://flagcdn.com/w40/ir.png",
+      "iraq": "https://flagcdn.com/w40/iq.png",
+      "ireland": "https://flagcdn.com/w40/ie.png",
+      "israel": "https://flagcdn.com/w40/il.png",
+      "italy": "https://flagcdn.com/w40/it.png",
+      "jamaica": "https://flagcdn.com/w40/jm.png",
+      "japan": "https://flagcdn.com/w40/jp.png",
+      "jordan": "https://flagcdn.com/w40/jo.png",
+      "kazakhstan": "https://flagcdn.com/w40/kz.png",
+      "kenya": "https://flagcdn.com/w40/ke.png",
+      "kuwait": "https://flagcdn.com/w40/kw.png",
+      "kyrgyzstan": "https://flagcdn.com/w40/kg.png",
+      "laos": "https://flagcdn.com/w40/la.png",
+      "latvia": "https://flagcdn.com/w40/lv.png",
+      "lebanon": "https://flagcdn.com/w40/lb.png",
+      "lesotho": "https://flagcdn.com/w40/ls.png",
+      "liberia": "https://flagcdn.com/w40/lr.png",
+      "libya": "https://flagcdn.com/w40/ly.png",
+      "liechtenstein": "https://flagcdn.com/w40/li.png",
+      "lithuania": "https://flagcdn.com/w40/lt.png",
+      "luxembourg": "https://flagcdn.com/w40/lu.png",
+      "madagascar": "https://flagcdn.com/w40/mg.png",
+      "malawi": "https://flagcdn.com/w40/mw.png",
+      "malaysia": "https://flagcdn.com/w40/my.png",
+      "maldives": "https://flagcdn.com/w40/mv.png",
+      "mali": "https://flagcdn.com/w40/ml.png",
+      "malta": "https://flagcdn.com/w40/mt.png",
+      "mauritania": "https://flagcdn.com/w40/mr.png",
+      "mauritius": "https://flagcdn.com/w40/mu.png",
+      "mexico": "https://flagcdn.com/w40/mx.png",
+      "moldova": "https://flagcdn.com/w40/md.png",
+      "monaco": "https://flagcdn.com/w40/mc.png",
+      "mongolia": "https://flagcdn.com/w40/mn.png",
+      "montenegro": "https://flagcdn.com/w40/me.png",
+      "morocco": "https://flagcdn.com/w40/ma.png",
+      "mozambique": "https://flagcdn.com/w40/mz.png",
+      "myanmar": "https://flagcdn.com/w40/mm.png",
+      "namibia": "https://flagcdn.com/w40/na.png",
+      "nepal": "https://flagcdn.com/w40/np.png",
+      "netherlands": "https://flagcdn.com/w40/nl.png",
+      "newzealand": "https://flagcdn.com/w40/nz.png",
+      "nicaragua": "https://flagcdn.com/w40/ni.png",
+      "niger": "https://flagcdn.com/w40/ne.png",
+      "nigeria": "https://flagcdn.com/w40/ng.png",
+      "northkorea": "https://flagcdn.com/w40/kp.png",
+      "northmacedonia": "https://flagcdn.com/w40/mk.png",
+      "norway": "https://flagcdn.com/w40/no.png",
+      "oman": "https://flagcdn.com/w40/om.png",
+      "pakistan": "https://flagcdn.com/w40/pk.png",
+      "palestine": "https://flagcdn.com/w40/ps.png",
+      "panama": "https://flagcdn.com/w40/pa.png",
+      "paraguay": "https://flagcdn.com/w40/py.png",
+      "peru": "https://flagcdn.com/w40/pe.png",
+      "philippines": "https://flagcdn.com/w40/ph.png",
+      "poland": "https://flagcdn.com/w40/pl.png",
+      "portugal": "https://flagcdn.com/w40/pt.png",
+      "qatar": "https://flagcdn.com/w40/qa.png",
+      "romania": "https://flagcdn.com/w40/ro.png",
+      "russia": "https://flagcdn.com/w40/ru.png",
+      "rwanda": "https://flagcdn.com/w40/rw.png",
+      "saudiarabia": "https://flagcdn.com/w40/sa.png",
+      "senegal": "https://flagcdn.com/w40/sn.png",
+      "serbia": "https://flagcdn.com/w40/rs.png",
+      "singapore": "https://flagcdn.com/w40/sg.png",
+      "slovakia": "https://flagcdn.com/w40/sk.png",
+      "slovenia": "https://flagcdn.com/w40/si.png",
+      "somalia": "https://flagcdn.com/w40/so.png",
+      "southafrica": "https://flagcdn.com/w40/za.png",
+      "southkorea": "https://flagcdn.com/w40/kr.png",
+      "spain": "https://flagcdn.com/w40/es.png",
+      "srilanka": "https://flagcdn.com/w40/lk.png",
+      "sudan": "https://flagcdn.com/w40/sd.png",
+      "suriname": "https://flagcdn.com/w40/sr.png",
+      "sweden": "https://flagcdn.com/w40/se.png",
+      "switzerland": "https://flagcdn.com/w40/ch.png",
+      "syria": "https://flagcdn.com/w40/sy.png",
+      "tajikistan": "https://flagcdn.com/w40/tj.png",
+      "tanzania": "https://flagcdn.com/w40/tz.png",
+      "thailand": "https://flagcdn.com/w40/th.png",
+      "togo": "https://flagcdn.com/w40/tg.png",
+      "tunisia": "https://flagcdn.com/w40/tn.png",
+      "turkey": "https://flagcdn.com/w40/tr.png",
+      "turkmenistan": "https://flagcdn.com/w40/tm.png",
+      "uganda": "https://flagcdn.com/w40/ug.png",
+      "ukraine": "https://flagcdn.com/w40/ua.png",
+      "uae": "https://flagcdn.com/w40/ae.png",
+      "uk": "https://flagcdn.com/w40/gb.png",
+      "usa": "https://flagcdn.com/w40/us.png",
+      "uruguay": "https://flagcdn.com/w40/uy.png",
+      "uzbekistan": "https://flagcdn.com/w40/uz.png",
+      "venezuela": "https://flagcdn.com/w40/ve.png",
+      "vietnam": "https://flagcdn.com/w40/vn.png",
+      "yemen": "https://flagcdn.com/w40/ye.png",
+      "zambia": "https://flagcdn.com/w40/zm.png",
+      "zimbabwe": "https://flagcdn.com/w40/zw.png"
+    };
+    let selectedFlag = null;
+
+
+    function loadFlag(country) {
+      if (!country) {
+        selectedFlag = null;
+        drawMainCanvas();
+        drawEditCanvas();
+        return;
+      }
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        selectedFlag = img;
+        drawMainCanvas();
+        drawEditCanvas();
+      };
+      img.onerror = () => {
+        alert("Flag failed to load.");
+        selectedFlag = null;
+      };
+      img.src = flagPaths[country];
+    }
+
+    // Draw selected flag if available
+    if (selectedFlag && selectedFlag.complete) {
+      const canvasSize = 300;
+
+      // Maintain the original aspect ratio
+      const aspectRatio = selectedFlag.width / selectedFlag.height;
+
+      // Set desired flag dimensions
+      const targetHeight = 40;
+      const targetWidth = targetHeight * aspectRatio;
+
+      // Position slightly above the bottom (around 30px padding from bottom)
+      const x = (canvasSize - targetWidth) / 2;
+      const y = canvasSize - targetHeight - 30;
+
+      context.drawImage(selectedFlag, x, y, targetWidth, targetHeight);
+    }
+
+    // Initial Setup
+    setFrame("default");
+    lucide.createIcons();
+
+    // Try to load an example image
+    userImg = new Image();
+    userImg.crossOrigin = "anonymous";
+    userImg.onload = () => {
+      drawMainCanvas();
+    };
+    userImg.onerror = () => {
+      console.warn("Example image not found. Will draw only the frame.");
+      userImg = null;
+      drawMainCanvas();
+    };
+    userImg.src = "assets/user.jpg";
+
+    // Browser Warning
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const inAppBrowser = /FBAN|FBAV|Instagram|Line|Twitter/i.test(ua);
+    if (inAppBrowser) {
+      document.getElementById("browserWarning").classList.remove("hidden");
+    }
+
+    function loadImage(src) {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        userImg = img;
+        resetImage();
+        drawEditCanvas();
+        editorModal.showModal();
+      };
+      img.onerror = () => {
+        alert("Unable to load the uploaded image.");
+      };
+      img.src = src;
+    }
+  </script>
+</body>
+
+</html>
