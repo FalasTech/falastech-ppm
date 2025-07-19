@@ -1,3 +1,6 @@
+[![Code for Liberation](https://img.shields.io/badge/🇵🇸%20Code_for_Liberation-falastech.org-%23E60023.svg)](https://falastech.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey.svg)](https://github.com/FalasTech/falastech-website/blob/main/LICENSE)
+
 # 🇵🇸 Palestine Profile Pic Maker
 
 🚨 **LAUNCH ALERT:** The Palestine Profile Pic Maker is now live!  
