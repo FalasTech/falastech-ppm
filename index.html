@@ -315,6 +315,14 @@
         class="w-full px-5 py-2 rounded-full bg-gray-500 text-white hover:bg-gray-600 shadow">Back to Edit</button>
       <button id="startOverBtn"
         class="w-full px-5 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 shadow">Start Over</button>
+        
+        <label for="resolutionSelect" class="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-100">Choose Image Quality:</label>
+        <select id="resolutionSelect"
+          class="w-full px-4 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-600">
+          <option value="1080">1080x1080 (FHD)</option>
+          <option value="512">512x512 (HD)</option>
+          <option value="300" selected>300x300 (SD)</option>
+        </select>
     </div>
     <p class="text-xs mt-4 text-gray-400 dark:text-gray-500 text-center">Note: This tool works entirely in your browser.
       We don’t store or share your data.</p>
@@ -489,9 +497,78 @@
     }
 
     function downloadImage() {
+      // Get the selected resolution from the dropdown
+      const resolutionSelect = document.getElementById("resolutionSelect");
+      const size = parseInt(resolutionSelect.value, 10);
+      
+      // Create a new canvas in memory with the selected size
+      const highResCanvas = document.createElement("canvas");
+      highResCanvas.width = size;
+      highResCanvas.height = size;
+      const highResCtx = highResCanvas.getContext("2d");
+
+      const scaleFactor = size / 300;
+
+      // Draw the frame onto the high-resolution canvas, scaled up
+      if (frame && frame.complete) {
+        highResCtx.drawImage(frame, 0, 0, size, size);
+      }
+
+      // Draw the user image with the new resolution and original transformations, all scaled up
+      if (userImg && userImg.complete && userImg.naturalWidth > 0) {
+        highResCtx.save();
+        highResCtx.beginPath();
+        highResCtx.arc(size / 2, size / 2, (size / 2) * 0.9, 0, Math.PI * 2);
+        highResCtx.closePath();
+        highResCtx.clip();
+        highResCtx.translate(size / 2, size / 2);
+        highResCtx.rotate(rotation);
+        const scaledImgSize = 300 * scale * scaleFactor;
+        highResCtx.drawImage(
+          userImg,
+          -scaledImgSize / 2 + (imgX - 150) * scaleFactor,
+          -scaledImgSize / 2 + (imgY - 150) * scaleFactor,
+          scaledImgSize,
+          scaledImgSize
+        );
+        highResCtx.restore();
+      }
+
+      // Draw the flag if applicable, also scaled up.
+      if (currentFrame === "flag" && selectedFlag && selectedFlag.complete) {
+        const targetHeight = 32 * scaleFactor;
+        const targetWidth = targetHeight * 1.5;
+        const x = (size - targetWidth) / 2;
+        const y = size - targetHeight - 30 * scaleFactor;
+        const radius = 6 * scaleFactor;
+
+        highResCtx.save();
+        highResCtx.shadowColor = "rgba(0, 0, 0, 0.3)";
+        highResCtx.shadowBlur = 8 * scaleFactor;
+        highResCtx.shadowOffsetX = 0;
+        highResCtx.shadowOffsetY = 4 * scaleFactor;
+
+        highResCtx.beginPath();
+        highResCtx.moveTo(x + radius, y);
+        highResCtx.lineTo(x + targetWidth - radius, y);
+        highResCtx.quadraticCurveTo(x + targetWidth, y, x + targetWidth, y + radius);
+        highResCtx.lineTo(x + targetWidth, y + targetHeight - radius);
+        highResCtx.quadraticCurveTo(x + targetWidth, y + targetHeight, x + targetWidth - radius, y + targetHeight);
+        highResCtx.lineTo(x + radius, y + targetHeight);
+        highResCtx.quadraticCurveTo(x, y + targetHeight, x, y + targetHeight - radius);
+        highResCtx.lineTo(x, y + radius);
+        highResCtx.quadraticCurveTo(x, y, x + radius, y);
+        highResCtx.closePath();
+        highResCtx.clip();
+
+        highResCtx.drawImage(selectedFlag, x, y, targetWidth, targetHeight);
+        highResCtx.restore();
+      }
+
+      // Trigger the download using the new high-resolution canvas.
       const link = document.createElement("a");
-      link.download = "solidarity-profile.png";
-      link.href = document.getElementById("canvas").toDataURL("image/png");
+      link.download = `falastech-ppm_${size}x${size}.png`;
+      link.href = highResCanvas.toDataURL("image/png");
       link.click();
     }
 
