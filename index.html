@@ -6,33 +6,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Palestine Profile Maker - FalasTech</title>
 
-  <!-- Primary Meta Tags -->
   <meta name="title" content="FalasTech - Palestine Profile Pic Generator 🇵🇸">
-  <meta name="description" content="Show your support for Palestine with custom profile frames and overlays. Add your country flag to proudly represent where you're supporting from.">
-  <meta name="keywords" content="FalasTech, Palestine, profile picture maker, palestine profile generator, country flags, solidarity, Free Palestine, digital activism, tech for justice, open-source">
+  <meta name="description"
+    content="Show your support for Palestine with custom profile frames and overlays. Add your country flag to proudly represent where you're supporting from.">
+  <meta name="keywords"
+    content="FalasTech, Palestine, profile picture maker, palestine profile generator, country flags, solidarity, Free Palestine, digital activism, tech for justice, open-source">
   <meta name="robots" content="index, follow">
   <meta name="author" content="FalasTech">
 
-  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ppm.falastech.org/">
   <meta property="og:title" content="Palestine Profile Pic Generator by FalasTech">
-  <meta property="og:description" content="Create a custom profile picture with a Palestine frame and your country's flag — to show where you're supporting from. Stand in digital solidarity today.">
+  <meta property="og:description"
+    content="Create a custom profile picture with a Palestine frame and your country's flag — to show where you're supporting from. Stand in digital solidarity today.">
   <meta property="og:image" content="https://ppm.falastech.org/assets/preview-profile-maker.jpg">
 
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://ppm.falastech.org/">
   <meta name="twitter:title" content="Palestine Profile Pic Generator by FalasTech">
-  <meta name="twitter:description" content="Support Palestine digitally. Add a powerful Palestine frame and your country’s flag to your profile picture.">
+  <meta name="twitter:description"
+    content="Support Palestine digitally. Add a powerful Palestine frame and your country’s flag to your profile picture.">
   <meta name="twitter:image" content="https://ppm.falastech.org/assets/preview-profile-maker.jpg">
 
-  <!-- Favicon -->
   <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
 
-  <link rel="stylesheet" href="">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' }</script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     canvas {
@@ -47,310 +61,368 @@
     .icon-transition {
       transition: transform 0.3s ease, opacity 0.3s ease;
     }
+
+    .frame-thumbnail {
+      border: 3px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .frame-thumbnail.selected {
+      border-color: #EF4444;
+      /* Tailwind's `red-500` */
+    }
+
+    .resolution-button.selected {
+      background-color: #EF4444;
+      border-color: #EF4444;
+      color: white;
+    }
   </style>
 </head>
 
-<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen font-sans">
-  <div class="max-w-xl mx-auto p-4">
-    <div class="flex justify-between items-center mb-4">
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen font-sans">
+
+  <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold flex items-center">
+        <span class="mr-2 text-red-500">🇵🇸</span>
+        Palestine Profile Maker
+      </h1>
       <button id="themeButton"
-        class="text-sm px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 dark:text-white flex items-center gap-2">
+        class="text-sm p-2 rounded-full bg-gray-200 dark:bg-gray-700 dark:text-white flex items-center justify-center">
         <i id="themeIcon" data-lucide="sun" class="w-5 h-5 icon-transition"></i>
       </button>
-      <button id="previewButton" class="text-sm px-3 py-1 rounded bg-purple-600 text-white flex items-center gap-2">
-        <i data-lucide="eye" class="w-5 h-5"></i> Preview
-      </button>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto p-6">
+    <div class="flex flex-col md:flex-row gap-6">
+
+      <div class="flex-1">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg flex flex-col items-center">
+          <div class="mb-6 w-full flex justify-center">
+            <canvas id="canvas" width="300" height="300"
+              class="rounded-full border-4 border-gray-200 dark:border-gray-700 shadow-xl w-64 h-64 md:w-80 md:h-80"></canvas>
+          </div>
+          <div class="w-full text-center space-y-4">
+            <button id="previewButton"
+              class="w-full px-5 py-3 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors hidden">
+              Preview Profile Picture
+            </button>
+            <div id="editControls" class="flex justify-around items-center space-x-2 hidden">
+              <button id="zoomOutBtn" title="Zoom Out"
+                class="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i data-lucide="zoom-out" class="w-6 h-6 text-gray-700 dark:text-gray-200"></i>
+              </button>
+              <button id="zoomInBtn" title="Zoom In"
+                class="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i data-lucide="zoom-in" class="w-6 h-6 text-gray-700 dark:text-gray-200"></i>
+              </button>
+              <button id="rotateBtn" title="Rotate"
+                class="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i data-lucide="rotate-ccw" class="w-6 h-6 text-gray-700 dark:text-gray-200"></i>
+              </button>
+              <button id="resetBtn" title="Reset"
+                class="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i data-lucide="refresh-ccw" class="w-6 h-6 text-gray-700 dark:text-gray-200"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-1 space-y-6">
+
+        <div id="step1" class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg">
+          <h2 class="text-xl font-bold mb-4">Step 1: Get Your Photo</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <label for="upload"
+              class="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 cursor-pointer hover:border-red-500 transition">
+              <i data-lucide="image" class="w-8 h-8 text-gray-500 dark:text-gray-400 mb-2"></i>
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">Upload Image</span>
+            </label>
+            <input type="file" id="upload" accept="image/*" class="hidden" />
+
+            <button onClick="fetchAvatar('x')"
+              class="flex flex-col items-center justify-center p-6 rounded-2xl bg-black text-white hover:bg-gray-800 transition">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" class="h-8 w-8 filter invert mb-2">
+              <span class="text-sm font-semibold">X (Twitter)</span>
+            </button>
+            <button onClick="fetchAvatar('github')"
+              class="flex flex-col items-center justify-center p-6 rounded-2xl bg-gray-800 text-white hover:bg-gray-700 transition">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg"
+                class="h-8 w-8 filter invert mb-2">
+              <span class="text-sm font-semibold">GitHub</span>
+            </button>
+            <button onClick="fetchAvatar('gitlab')"
+              class="flex flex-col items-center justify-center p-6 rounded-2xl bg-red-600 text-white hover:bg-red-700 transition">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gitlab.svg"
+                class="h-8 w-8 filter invert mb-2">
+              <span class="text-sm font-semibold">GitLab</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="step2" class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg hidden">
+          <h2 class="text-xl font-bold mb-4">Step 2: Choose Your Frame</h2>
+          <div class="flex justify-around items-center space-x-2 mb-4">
+            <button onclick="changeFrame('default')" id="frameBtn_default"
+              class="relative w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden frame-thumbnail selected">
+              <img src="frames/bg.webp" alt="Default Frame" class="w-full h-full object-cover">
+            </button>
+            <button onclick="changeFrame('flag')" id="frameBtn_flag"
+              class="relative w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden frame-thumbnail">
+              <img src="frames/bg-country.webp" alt="With Country Flag" class="w-full h-full object-cover">
+            </button>
+            <button onclick="changeFrame('freepalestine')" id="frameBtn_freepalestine"
+              class="relative w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden frame-thumbnail">
+              <img src="frames/bg-freepalestine.webp" alt="#FreePalestine Overlay" class="w-full h-full object-cover">
+            </button>
+          </div>
+
+          <div id="countrySelectorContainer" class="hidden mt-4">
+            <label class="block text-sm font-medium mb-1">Select Country</label>
+            <select id="countrySelect"
+              class="w-full px-4 py-2 border rounded-xl bg-gray-100 dark:bg-gray-700 dark:border-gray-600">
+              <option value="">Choose a Country</option>
+              <option value="afghanistan">🇦🇫 Afghanistan</option>
+              <option value="albania">🇦🇱 Albania</option>
+              <option value="algeria">🇩🇿 Algeria</option>
+              <option value="andorra">🇦🇩 Andorra</option>
+              <option value="angola">🇦🇴 Angola</option>
+              <option value="argentina">🇦🇷 Argentina</option>
+              <option value="armenia">🇦🇲 Armenia</option>
+              <option value="australia">🇦🇺 Australia</option>
+              <option value="austria">🇦🇹 Austria</option>
+              <option value="azerbaijan">🇦🇿 Azerbaijan</option>
+              <option value="bahamas">🇧🇸 Bahamas</option>
+              <option value="bahrain">🇧🇭 Bahrain</option>
+              <option value="bangladesh">🇧🇩 Bangladesh</option>
+              <option value="barbados">🇧🇧 Barbados</option>
+              <option value="belarus">🇧🇾 Belarus</option>
+              <option value="belgium">🇧🇪 Belgium</option>
+              <option value="belize">🇧🇿 Belize</option>
+              <option value="benin">🇧🇯 Benin</option>
+              <option value="bhutan">🇧🇹 Bhutan</option>
+              <option value="bolivia">🇧🇴 Bolivia</option>
+              <option value="bosnia-and-herzegovina">🇧🇦 Bosnia and Herzegovina</option>
+              <option value="botswana">🇧🇼 Botswana</option>
+              <option value="brazil">🇧🇷 Brazil</option>
+              <option value="brunei">🇧🇳 Brunei</option>
+              <option value="bulgaria">🇧🇬 Bulgaria</option>
+              <option value="burkina-faso">🇧🇫 Burkina Faso</option>
+              <option value="burundi">🇧🇮 Burundi</option>
+              <option value="cambodia">🇰🇭 Cambodia</option>
+              <option value="cameroon">🇨🇲 Cameroon</option>
+              <option value="canada">🇨🇦 Canada</option>
+              <option value="cape-verde">🇨🇻 Cape Verde</option>
+              <option value="central-african-republic">🇨🇫 Central African Republic</option>
+              <option value="chad">🇹🇩 Chad</option>
+              <option value="chile">🇨🇱 Chile</option>
+              <option value="china">🇨🇳 China</option>
+              <option value="colombia">🇨🇴 Colombia</option>
+              <option value="comoros">🇰🇲 Comoros</option>
+              <option value="congo">🇨🇬 Congo</option>
+              <option value="costa-rica">🇨🇷 Costa Rica</option>
+              <option value="croatia">🇭🇷 Croatia</option>
+              <option value="cuba">🇨🇺 Cuba</option>
+              <option value="cyprus">🇨🇾 Cyprus</option>
+              <option value="czech-republic">🇨🇿 Czech Republic</option>
+              <option value="denmark">🇩🇰 Denmark</option>
+              <option value="djibouti">🇩🇯 Djibouti</option>
+              <option value="dominica">🇩🇲 Dominica</option>
+              <option value="dominican-republic">🇩🇴 Dominican Republic</option>
+              <option value="ecuador">🇪🇨 Ecuador</option>
+              <option value="egypt">🇪🇬 Egypt</option>
+              <option value="el-salvador">🇸🇻 El Salvador</option>
+              <option value="equatorial-guinea">🇬🇶 Equatorial Guinea</option>
+              <option value="eritrea">🇪🇷 Eritrea</option>
+              <option value="estonia">🇪🇪 Estonia</option>
+              <option value="eswatini">🇸🇿 Eswatini</option>
+              <option value="ethiopia">🇪🇹 Ethiopia</option>
+              <option value="fiji">🇫🇯 Fiji</option>
+              <option value="finland">🇫🇮 Finland</option>
+              <option value="france">🇫🇷 France</option>
+              <option value="gabon">🇬🇦 Gabon</option>
+              <option value="gambia">🇬🇲 Gambia</option>
+              <option value="georgia">🇬🇪 Georgia</option>
+              <option value="germany">🇩🇪 Germany</option>
+              <option value="ghana">🇬🇭 Ghana</option>
+              <option value="greece">🇬🇷 Greece</option>
+              <option value="grenada">🇬🇩 Grenada</option>
+              <option value="guatemala">🇬🇹 Guatemala</option>
+              <option value="guinea">🇬🇳 Guinea</option>
+              <option value="guinea-bissau">🇬🇼 Guinea-Bissau</option>
+              <option value="guyana">🇬🇾 Guyana</option>
+              <option value="haiti">🇭🇹 Haiti</option>
+              <option value="honduras">🇭🇳 Honduras</option>
+              <option value="hungary">🇭🇺 Hungary</option>
+              <option value="iceland">🇮🇸 Iceland</option>
+              <option value="india">🇮🇳 India</option>
+              <option value="indonesia">🇮🇩 Indonesia</option>
+              <option value="iran">🇮🇷 Iran</option>
+              <option value="iraq">🇮🇶 Iraq</option>
+              <option value="ireland">🇮🇪 Ireland</option>
+              <option value="israel">🇮🇱 Israel</option>
+              <option value="italy">🇮🇹 Italy</option>
+              <option value="jamaica">🇯🇲 Jamaica</option>
+              <option value="japan">🇯🇵 Japan</option>
+              <option value="jordan">🇯🇴 Jordan</option>
+              <option value="kazakhstan">🇰🇿 Kazakhstan</option>
+              <option value="kenya">🇰🇪 Kenya</option>
+              <option value="kiribati">🇰🇮 Kiribati</option>
+              <option value="kosovo">🇽🇰 Kosovo</option>
+              <option value="kuwait">🇰🇼 Kuwait</option>
+              <option value="kyrgyzstan">🇰🇬 Kyrgyzstan</option>
+              <option value="laos">🇱🇦 Laos</option>
+              <option value="latvia">🇱🇻 Latvia</option>
+              <option value="lebanon">🇱🇧 Lebanon</option>
+              <option value="lesotho">🇱🇸 Lesotho</option>
+              <option value="liberia">🇱🇷 Liberia</option>
+              <option value="libya">🇱🇾 Libya</option>
+              <option value="liechtenstein">🇱🇮 Liechtenstein</option>
+              <option value="lithuania">🇱🇹 Lithuania</option>
+              <option value="luxembourg">🇱🇺 Luxembourg</option>
+              <option value="madagascar">🇲🇬 Madagascar</option>
+              <option value="malawi">🇲🇼 Malawi</option>
+              <option value="malaysia">🇲🇾 Malaysia</option>
+              <option value="maldives">🇲🇻 Maldives</option>
+              <option value="mali">🇲🇱 Mali</option>
+              <option value="malta">🇲🇹 Malta</option>
+              <option value="marshall-islands">🇲🇭 Marshall Islands</option>
+              <option value="mauritania">🇲🇷 Mauritania</option>
+              <option value="mauritius">🇲🇺 Mauritius</option>
+              <option value="mexico">🇲🇽 Mexico</option>
+              <option value="micronesia">🇫🇲 Micronesia</option>
+              <option value="moldova">🇲🇩 Moldova</option>
+              <option value="monaco">🇲🇨 Monaco</option>
+              <option value="mongolia">🇲🇳 Mongolia</option>
+              <option value="montenegro">🇲🇪 Montenegro</option>
+              <option value="morocco">🇲🇦 Morocco</option>
+              <option value="mozambique">🇲🇿 Mozambique</option>
+              <option value="myanmar">🇲🇲 Myanmar</option>
+              <option value="namibia">🇳🇦 Namibia</option>
+              <option value="nauru">🇳🇷 Nauru</option>
+              <option value="nepal">🇳🇵 Nepal</option>
+              <option value="netherlands">🇳🇱 Netherlands</option>
+              <option value="new-zealand">🇳🇿 New Zealand</option>
+              <option value="nicaragua">🇳🇮 Nicaragua</option>
+              <option value="niger">🇳🇪 Niger</option>
+              <option value="nigeria">🇳🇬 Nigeria</option>
+              <option value="north-korea">🇰🇵 North Korea</option>
+              <option value="north-macedonia">🇲🇰 North Macedonia</option>
+              <option value="norway">🇳🇴 Norway</option>
+              <option value="oman">🇴🇲 Oman</option>
+              <option value="pakistan">🇵🇰 Pakistan</option>
+              <option value="palau">🇵🇼 Palau</option>
+              <option value="palestine">🇵🇸 Palestine</option>
+              <option value="panama">🇵🇦 Panama</option>
+              <option value="papua-new-guinea">🇵🇬 Papua New Guinea</option>
+              <option value="paraguay">🇵🇾 Paraguay</option>
+              <option value="peru">🇵🇪 Peru</option>
+              <option value="philippines">🇵🇭 Philippines</option>
+              <option value="poland">🇵🇱 Poland</option>
+              <option value="portugal">🇵🇹 Portugal</option>
+              <option value="qatar">🇶🇦 Qatar</option>
+              <option value="romania">🇷🇴 Romania</option>
+              <option value="russia">🇷🇺 Russia</option>
+              <option value="rwanda">🇷🇼 Rwanda</option>
+              <option value="saint-kitts-and-nevis">🇰🇳 Saint Kitts and Nevis</option>
+              <option value="saint-lucia">🇱🇨 Saint Lucia</option>
+              <option value="saint-vincent-and-the-grenadines">🇻🇨 Saint Vincent and the Grenadines</option>
+              <option value="samoa">🇼🇸 Samoa</option>
+              <option value="san-marino">🇸🇲 San Marino</option>
+              <option value="sao-tome-and-principe">🇸🇹 São Tomé and Príncipe</option>
+              <option value="saudi-arabia">🇸🇦 Saudi Arabia</option>
+              <option value="senegal">🇸🇳 Senegal</option>
+              <option value="serbia">🇷🇸 Serbia</option>
+              <option value="seychelles">🇸🇨 Seychelles</option>
+              <option value="sierra-leone">🇸🇱 Sierra Leone</option>
+              <option value="singapore">🇸🇬 Singapore</option>
+              <option value="slovakia">🇸🇰 Slovakia</option>
+              <option value="slovenia">🇸🇮 Slovenia</option>
+              <option value="solomon-islands">🇸🇧 Solomon Islands</option>
+              <option value="somalia">🇸🇴 Somalia</option>
+              <option value="south-africa">🇿🇦 South Africa</option>
+              <option value="south-korea">🇰🇷 South Korea</option>
+              <option value="south-sudan">🇸🇸 South Sudan</option>
+              <option value="spain">🇪🇸 Spain</option>
+              <option value="sri-lanka">🇱🇰 Sri Lanka</option>
+              <option value="sudan">🇸🇩 Sudan</option>
+              <option value="suriname">🇸🇷 Suriname</option>
+              <option value="sweden">🇸🇪 Sweden</option>
+              <option value="switzerland">🇨🇭 Switzerland</option>
+              <option value="syria">🇸🇾 Syria</option>
+              <option value="taiwan">🇹🇼 Taiwan</option>
+              <option value="tajikistan">🇹🇯 Tajikistan</option>
+              <option value="tanzania">🇹🇿 Tanzania</option>
+              <option value="thailand">🇹🇭 Thailand</option>
+              <option value="togo">🇹🇬 Togo</option>
+              <option value="tonga">🇹🇴 Tonga</option>
+              <option value="trinidad-and-tobago">🇹🇹 Trinidad and Tobago</option>
+              <option value="tunisia">🇹🇳 Tunisia</option>
+              <option value="turkey">🇹🇷 Turkey</option>
+              <option value="turkmenistan">🇹🇲 Turkmenistan</option>
+              <option value="tuvalu">🇹🇻 Tuvalu</option>
+              <option value="uganda">🇺🇬 Uganda</option>
+              <option value="ukraine">🇺🇦 Ukraine</option>
+              <option value="united-arab-emirates">🇦🇪 United Arab Emirates</option>
+              <option value="united-kingdom">🇬🇧 United Kingdom</option>
+              <option value="united-states">🇺🇸 United States</option>
+              <option value="uruguay">🇺🇾 Uruguay</option>
+              <option value="uzbekistan">🇺🇿 Uzbekistan</option>
+              <option value="vanuatu">🇻🇺 Vanuatu</option>
+              <option value="vatican-city">🇻🇦 Vatican City</option>
+              <option value="venezuela">🇻🇪 Venezuela</option>
+              <option value="vietnam">🇻🇳 Vietnam</option>
+              <option value="yemen">🇾🇪 Yemen</option>
+              <option value="zambia">🇿🇲 Zambia</option>
+              "zimbabwe": "zw"
+            </select>
+          </div>
+        </div>
+
+        <div id="step3" class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg hidden">
+          <h2 class="text-xl font-bold mb-4">Step 3: Download & Share</h2>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Choose your preferred image quality and download your
+            new profile picture.</p>
+          <div class="flex justify-between items-center gap-2 mb-4">
+            <span class="text-sm font-medium">Select Size:</span>
+            <div class="flex space-x-2">
+              <button onclick="selectResolution(300)" id="resBtn_300"
+                class="resolution-button px-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 font-semibold selected">300x300</button>
+              <button onclick="selectResolution(512)" id="resBtn_512"
+                class="resolution-button px-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 font-semibold">512x512</button>
+              <button onclick="selectResolution(1080)" id="resBtn_1080"
+                class="resolution-button px-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 font-semibold">1080x1080</button>
+            </div>
+          </div>
+          <button id="downloadBtn"
+            class="w-full px-5 py-3 rounded-full bg-green-600 text-white hover:bg-green-700 transition shadow-lg font-semibold">
+            Download Final Image
+          </button>
+        </div>
+
+      </div>
+
     </div>
 
     <div id="browserWarning"
-      class="hidden bg-red-100 text-red-700 p-2 mb-4 rounded font-medium text-sm text-center dark:bg-red-800 dark:text-white">
-      ⚠️ Unsupported Browser Detected. Please open this page in your default browser for best experience.
+      class="hidden mt-6 bg-red-100 text-red-700 p-4 rounded-xl font-medium text-sm text-center dark:bg-red-800 dark:text-white">
+      ⚠️ Unsupported Browser Detected. Please open this page in your default browser for the best experience.
     </div>
 
-    <h1 class="text-3xl font-extrabold mb-2 text-center">Raise Your Voice <span
-        class="text-gray-400 text-xl">🇵🇸</span></h1>
-    <p class="mb-4 text-center text-gray-600 dark:text-gray-300">Let’s stand as one by reflecting the cause in our
-      profile pictures. ✊</p>
-    <div class="flex justify-center mb-4">
-      <canvas id="canvas" width="300" height="300"
-        class="rounded-full border-4 border-gray-300 dark:border-gray-600 shadow-md"></canvas>
-    </div>
-    <div id="inputSection">
-      <div class="flex justify-center mb-4">
-        <label for="upload"
-          class="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 text-white cursor-pointer hover:bg-blue-700">
-          <i data-lucide="image" class="w-5 h-5"></i> Upload Image
-        </label>
-        <input type="file" id="upload" accept="image/*" class="hidden" />
-      </div>
-      <div class="flex flex-wrap gap-2 justify-center mb-4">
-        <button onClick="fetchAvatar('x')" class="px-4 py-2 rounded bg-black text-white hover:bg-gray-800"><img
-            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" class="inline h-5 w-5 mr-1 filter invert"> X
-          (Twitter)</button>
-        <button onClick="fetchAvatar('github')" class="px-4 py-2 rounded bg-gray-800 text-white hover:bg-gray-700"><img
-            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg"
-            class="inline h-5 w-5 mr-1 filter invert"> GitHub</button>
-        <button onClick="fetchAvatar('gitlab')" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"><img
-            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gitlab.svg"
-            class="inline h-5 w-5 mr-1 filter invert"> GitLab</button>
-      </div>
-      <div class="mb-6">
-        <label class="block text-sm font-medium mb-1">Select Frame</label>
-        <select id="frameSelect" onchange="changeFrame()"
-          class="w-full px-4 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-600">
-          <option value="bg.webp">🖼️ Default Frame</option>
-          <option value="bg-country.webp">🎌 With Your Country Flag</option>
-          <option value="bg-freepalestine.webp">🍉 #FreePalestine Overlay</option>
-        </select>
-      </div>
+    <p class="text-xs mt-6 text-gray-400 dark:text-gray-500 text-center">
+      This tool is open-source and works entirely in your browser. We don’t store or share your data.
+    </p>
 
-      <!-- COUNTRY SELECTION (initially hidden) -->
-      <div id="countrySelectorContainer" class="mb-4 hidden">
-        <label class="block text-sm font-medium mb-1">Select Country</label>
-        <select id="countrySelect"
-          class="w-full px-4 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-600">
-          <option value="">Choose a Country</option>
-          <option value="afghanistan">🇦🇫 Afghanistan</option>
-          <option value="albania">🇦🇱 Albania</option>
-          <option value="algeria">🇩🇿 Algeria</option>
-          <option value="andorra">🇦🇩 Andorra</option>
-          <option value="angola">🇦🇴 Angola</option>
-          <option value="argentina">🇦🇷 Argentina</option>
-          <option value="armenia">🇦🇲 Armenia</option>
-          <option value="australia">🇦🇺 Australia</option>
-          <option value="austria">🇦🇹 Austria</option>
-          <option value="azerbaijan">🇦🇿 Azerbaijan</option>
-          <option value="bahamas">🇧🇸 Bahamas</option>
-          <option value="bahrain">🇧🇭 Bahrain</option>
-          <option value="bangladesh">🇧🇩 Bangladesh</option>
-          <option value="barbados">🇧🇧 Barbados</option>
-          <option value="belarus">🇧🇾 Belarus</option>
-          <option value="belgium">🇧🇪 Belgium</option>
-          <option value="belize">🇧🇿 Belize</option>
-          <option value="benin">🇧🇯 Benin</option>
-          <option value="bhutan">🇧🇹 Bhutan</option>
-          <option value="bolivia">🇧🇴 Bolivia</option>
-          <option value="bosnia-and-herzegovina">🇧🇦 Bosnia and Herzegovina</option>
-          <option value="botswana">🇧🇼 Botswana</option>
-          <option value="brazil">🇧🇷 Brazil</option>
-          <option value="brunei">🇧🇳 Brunei</option>
-          <option value="bulgaria">🇧🇬 Bulgaria</option>
-          <option value="burkina-faso">🇧🇫 Burkina Faso</option>
-          <option value="burundi">🇧🇮 Burundi</option>
-          <option value="cambodia">🇰🇭 Cambodia</option>
-          <option value="cameroon">🇨🇲 Cameroon</option>
-          <option value="canada">🇨🇦 Canada</option>
-          <option value="cape-verde">🇨🇻 Cape Verde</option>
-          <option value="central-african-republic">🇨🇫 Central African Republic</option>
-          <option value="chad">🇹🇩 Chad</option>
-          <option value="chile">🇨🇱 Chile</option>
-          <option value="china">🇨🇳 China</option>
-          <option value="colombia">🇨🇴 Colombia</option>
-          <option value="comoros">🇰🇲 Comoros</option>
-          <option value="congo">🇨🇬 Congo</option>
-          <option value="costa-rica">🇨🇷 Costa Rica</option>
-          <option value="croatia">🇭🇷 Croatia</option>
-          <option value="cuba">🇨🇺 Cuba</option>
-          <option value="cyprus">🇨🇾 Cyprus</option>
-          <option value="czech-republic">🇨🇿 Czech Republic</option>
-          <option value="denmark">🇩🇰 Denmark</option>
-          <option value="djibouti">🇩🇯 Djibouti</option>
-          <option value="dominica">🇩🇲 Dominica</option>
-          <option value="dominican-republic">🇩🇴 Dominican Republic</option>
-          <option value="ecuador">🇪🇨 Ecuador</option>
-          <option value="egypt">🇪🇬 Egypt</option>
-          <option value="el-salvador">🇸🇻 El Salvador</option>
-          <option value="equatorial-guinea">🇬🇶 Equatorial Guinea</option>
-          <option value="eritrea">🇪🇷 Eritrea</option>
-          <option value="estonia">🇪🇪 Estonia</option>
-          <option value="eswatini">🇸🇿 Eswatini</option>
-          <option value="ethiopia">🇪🇹 Ethiopia</option>
-          <option value="fiji">🇫🇯 Fiji</option>
-          <option value="finland">🇫🇮 Finland</option>
-          <option value="france">🇫🇷 France</option>
-          <option value="gabon">🇬🇦 Gabon</option>
-          <option value="gambia">🇬🇲 Gambia</option>
-          <option value="georgia">🇬🇪 Georgia</option>
-          <option value="germany">🇩🇪 Germany</option>
-          <option value="ghana">🇬🇭 Ghana</option>
-          <option value="greece">🇬🇷 Greece</option>
-          <option value="grenada">🇬🇩 Grenada</option>
-          <option value="guatemala">🇬🇹 Guatemala</option>
-          <option value="guinea">🇬🇳 Guinea</option>
-          <option value="guinea-bissau">🇬🇼 Guinea-Bissau</option>
-          <option value="guyana">🇬🇾 Guyana</option>
-          <option value="haiti">🇭🇹 Haiti</option>
-          <option value="honduras">🇭🇳 Honduras</option>
-          <option value="hungary">🇭🇺 Hungary</option>
-          <option value="iceland">🇮🇸 Iceland</option>
-          <option value="india">🇮🇳 India</option>
-          <option value="indonesia">🇮🇩 Indonesia</option>
-          <option value="iran">🇮🇷 Iran</option>
-          <option value="iraq">🇮🇶 Iraq</option>
-          <option value="ireland">🇮🇪 Ireland</option>
-          <option value="israel">🇮🇱 Israel</option>
-          <option value="italy">🇮🇹 Italy</option>
-          <option value="jamaica">🇯🇲 Jamaica</option>
-          <option value="japan">🇯🇵 Japan</option>
-          <option value="jordan">🇯🇴 Jordan</option>
-          <option value="kazakhstan">🇰🇿 Kazakhstan</option>
-          <option value="kenya">🇰🇪 Kenya</option>
-          <option value="kiribati">🇰🇮 Kiribati</option>
-          <option value="kosovo">🇽🇰 Kosovo</option>
-          <option value="kuwait">🇰🇼 Kuwait</option>
-          <option value="kyrgyzstan">🇰🇬 Kyrgyzstan</option>
-          <option value="laos">🇱🇦 Laos</option>
-          <option value="latvia">🇱🇻 Latvia</option>
-          <option value="lebanon">🇱🇧 Lebanon</option>
-          <option value="lesotho">🇱🇸 Lesotho</option>
-          <option value="liberia">🇱🇷 Liberia</option>
-          <option value="libya">🇱🇾 Libya</option>
-          <option value="liechtenstein">🇱🇮 Liechtenstein</option>
-          <option value="lithuania">🇱🇹 Lithuania</option>
-          <option value="luxembourg">🇱🇺 Luxembourg</option>
-          <option value="madagascar">🇲🇬 Madagascar</option>
-          <option value="malawi">🇲🇼 Malawi</option>
-          <option value="malaysia">🇲🇾 Malaysia</option>
-          <option value="maldives">🇲🇻 Maldives</option>
-          <option value="mali">🇲🇱 Mali</option>
-          <option value="malta">🇲🇹 Malta</option>
-          <option value="marshall-islands">🇲🇭 Marshall Islands</option>
-          <option value="mauritania">🇲🇷 Mauritania</option>
-          <option value="mauritius">🇲🇺 Mauritius</option>
-          <option value="mexico">🇲🇽 Mexico</option>
-          <option value="micronesia">🇫🇲 Micronesia</option>
-          <option value="moldova">🇲🇩 Moldova</option>
-          <option value="monaco">🇲🇨 Monaco</option>
-          <option value="mongolia">🇲🇳 Mongolia</option>
-          <option value="montenegro">🇲🇪 Montenegro</option>
-          <option value="morocco">🇲🇦 Morocco</option>
-          <option value="mozambique">🇲🇿 Mozambique</option>
-          <option value="myanmar">🇲🇲 Myanmar</option>
-          <option value="namibia">🇳🇦 Namibia</option>
-          <option value="nauru">🇳🇷 Nauru</option>
-          <option value="nepal">🇳🇵 Nepal</option>
-          <option value="netherlands">🇳🇱 Netherlands</option>
-          <option value="new-zealand">🇳🇿 New Zealand</option>
-          <option value="nicaragua">🇳🇮 Nicaragua</option>
-          <option value="niger">🇳🇪 Niger</option>
-          <option value="nigeria">🇳🇬 Nigeria</option>
-          <option value="north-korea">🇰🇵 North Korea</option>
-          <option value="north-macedonia">🇲🇰 North Macedonia</option>
-          <option value="norway">🇳🇴 Norway</option>
-          <option value="oman">🇴🇲 Oman</option>
-          <option value="pakistan">🇵🇰 Pakistan</option>
-          <option value="palau">🇵🇼 Palau</option>
-          <option value="palestine">🇵🇸 Palestine</option>
-          <option value="panama">🇵🇦 Panama</option>
-          <option value="papua-new-guinea">🇵🇬 Papua New Guinea</option>
-          <option value="paraguay">🇵🇾 Paraguay</option>
-          <option value="peru">🇵🇪 Peru</option>
-          <option value="philippines">🇵🇭 Philippines</option>
-          <option value="poland">🇵🇱 Poland</option>
-          <option value="portugal">🇵🇹 Portugal</option>
-          <option value="qatar">🇶🇦 Qatar</option>
-          <option value="romania">🇷🇴 Romania</option>
-          <option value="russia">🇷🇺 Russia</option>
-          <option value="rwanda">🇷🇼 Rwanda</option>
-          <option value="saint-kitts-and-nevis">🇰🇳 Saint Kitts and Nevis</option>
-          <option value="saint-lucia">🇱🇨 Saint Lucia</option>
-          <option value="saint-vincent-and-the-grenadines">🇻🇨 Saint Vincent and the Grenadines</option>
-          <option value="samoa">🇼🇸 Samoa</option>
-          <option value="san-marino">🇸🇲 San Marino</option>
-          <option value="sao-tome-and-principe">🇸🇹 São Tomé and Príncipe</option>
-          <option value="saudi-arabia">🇸🇦 Saudi Arabia</option>
-          <option value="senegal">🇸🇳 Senegal</option>
-          <option value="serbia">🇷🇸 Serbia</option>
-          <option value="seychelles">🇸🇨 Seychelles</option>
-          <option value="sierra-leone">🇸🇱 Sierra Leone</option>
-          <option value="singapore">🇸🇬 Singapore</option>
-          <option value="slovakia">🇸🇰 Slovakia</option>
-          <option value="slovenia">🇸🇮 Slovenia</option>
-          <option value="solomon-islands">🇸🇧 Solomon Islands</option>
-          <option value="somalia">🇸🇴 Somalia</option>
-          <option value="south-africa">🇿🇦 South Africa</option>
-          <option value="south-korea">🇰🇷 South Korea</option>
-          <option value="south-sudan">🇸🇸 South Sudan</option>
-          <option value="spain">🇪🇸 Spain</option>
-          <option value="sri-lanka">🇱🇰 Sri Lanka</option>
-          <option value="sudan">🇸🇩 Sudan</option>
-          <option value="suriname">🇸🇷 Suriname</option>
-          <option value="sweden">🇸🇪 Sweden</option>
-          <option value="switzerland">🇨🇭 Switzerland</option>
-          <option value="syria">🇸🇾 Syria</option>
-          <option value="taiwan">🇹🇼 Taiwan</option>
-          <option value="tajikistan">🇹🇯 Tajikistan</option>
-          <option value="tanzania">🇹🇿 Tanzania</option>
-          <option value="thailand">🇹🇭 Thailand</option>
-          <option value="togo">🇹🇬 Togo</option>
-          <option value="tonga">🇹🇴 Tonga</option>
-          <option value="trinidad-and-tobago">🇹🇹 Trinidad and Tobago</option>
-          <option value="tunisia">🇹🇳 Tunisia</option>
-          <option value="turkey">🇹🇷 Turkey</option>
-          <option value="turkmenistan">🇹🇲 Turkmenistan</option>
-          <option value="tuvalu">🇹🇻 Tuvalu</option>
-          <option value="uganda">🇺🇬 Uganda</option>
-          <option value="ukraine">🇺🇦 Ukraine</option>
-          <option value="united-arab-emirates">🇦🇪 United Arab Emirates</option>
-          <option value="united-kingdom">🇬🇧 United Kingdom</option>
-          <option value="united-states">🇺🇸 United States</option>
-          <option value="uruguay">🇺🇾 Uruguay</option>
-          <option value="uzbekistan">🇺🇿 Uzbekistan</option>
-          <option value="vanuatu">🇻🇺 Vanuatu</option>
-          <option value="vatican-city">🇻🇦 Vatican City</option>
-          <option value="venezuela">🇻🇪 Venezuela</option>
-          <option value="vietnam">🇻🇳 Vietnam</option>
-          <option value="yemen">🇾🇪 Yemen</option>
-          <option value="zambia">🇿🇲 Zambia</option>
-          <option value="zimbabwe">🇿🇼 Zimbabwe</option>
-        </select>
-      </div>
+  </main>
 
-
-    </div>
-    <div id="finalButtons" class="space-y-2 hidden">
-      <button id="downloadBtn"
-        class="w-full px-5 py-2 rounded-full bg-green-600 text-white hover:bg-green-700 shadow">Download Image</button>
-      <button id="backEditBtn"
-        class="w-full px-5 py-2 rounded-full bg-gray-500 text-white hover:bg-gray-600 shadow">Back to Edit</button>
-      <button id="startOverBtn"
-        class="w-full px-5 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 shadow">Start Over</button>
-        
-        <label for="resolutionSelect" class="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-100">Choose Image Quality:</label>
-        <select id="resolutionSelect"
-          class="w-full px-4 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-600">
-          <option value="1080">1080x1080 (FHD)</option>
-          <option value="512">512x512 (HD)</option>
-          <option value="300" selected>300x300 (SD)</option>
-        </select>
-    </div>
-    <p class="text-xs mt-4 text-gray-400 dark:text-gray-500 text-center">Note: This tool works entirely in your browser.
-      We don’t store or share your data.</p>
-  </div>
-
-  <dialog id="editorModal" class="p-4 bg-white dark:bg-gray-800 rounded shadow-md w-[340px]">
-    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Edit Your Image</h2>
-    <canvas id="editCanvas" width="300" height="300" class="rounded-full border mb-4 shadow"></canvas>
-    <div class="flex justify-center items-center gap-4 mb-4">
-      <button id="zoomInBtn" title="Zoom In" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><i
-          data-lucide="zoom-in" class="w-5 h-5 text-gray-700 dark:text-gray-200"></i></button>
-      <button id="zoomOutBtn" title="Zoom Out" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><i
-          data-lucide="zoom-out" class="w-5 h-5 text-gray-700 dark:text-gray-200"></i></button>
-      <button id="rotateBtn" title="Rotate" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><i
-          data-lucide="rotate-ccw" class="w-5 h-5 text-gray-700 dark:text-gray-200"></i></button>
-      <button id="resetBtn" title="Reset" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><i
-          data-lucide="refresh-ccw" class="w-5 h-5 text-gray-700 dark:text-gray-200"></i></button>
-    </div>
-    <div class="text-center">
-      <button id="applyBtn" title="Done Editing" class="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"><i
-          data-lucide="check" class="w-5 h-5"></i></button>
-    </div>
-  </dialog>
+  <script src="country_codes.js"></script>
 
   <script>
     let userImg = new Image();
     userImg.crossOrigin = "anonymous";
-
     let frame = new Image();
     let currentFrame = "default";
     let framePaths = {
@@ -360,12 +432,15 @@
     };
     let flagImg = new Image();
     flagImg.crossOrigin = "anonymous";
-
+    let selectedFlag = null;
     let selectedCountry = null;
-
-    let imgX = 150, imgY = 150, isDragging = false, startX, startY;
-    let scale = 1, rotation = 0;
-
+    let selectedResolution = 300;
+    let imgX = 150,
+      imgY = 150,
+      isDragging = false,
+      startX, startY;
+    let scale = 1,
+      rotation = 0;
     const html = document.documentElement;
 
     function toggleDarkMode() {
@@ -380,53 +455,65 @@
       frame.crossOrigin = "anonymous";
       frame.src = framePaths[type];
       frame.onload = () => {
-        drawEditCanvas();
         drawMainCanvas();
       };
     }
 
-    function drawCanvas(context, image) {
-      context.clearRect(0, 0, 300, 300);
+    function drawCanvas(context, image, canvasSize = 300) {
+      context.clearRect(0, 0, canvasSize, canvasSize);
       // Always draw the frame
       if (frame && frame.complete) {
-        context.drawImage(frame, 0, 0, 300, 300);
+        context.drawImage(frame, 0, 0, canvasSize, canvasSize);
       }
-
       // Draw user image only if it's valid
       if (image && image.complete && image.naturalWidth > 0) {
         context.save();
         context.beginPath();
-        context.arc(150, 150, 130, 0, Math.PI * 2);
+        context.arc(canvasSize / 2, canvasSize / 2, (canvasSize / 2) * 0.9, 0, Math.PI * 2);
         context.closePath();
         context.clip();
-        context.translate(150, 150);
+        context.translate(canvasSize / 2, canvasSize / 2);
         context.rotate(rotation);
-        const size = 300 * scale;
-        context.drawImage(image, -size / 2 + (imgX - 150), -size / 2 + (imgY - 150), size, size);
+
+        // --- ASPECT RATIO FIX START ---
+        const targetDim = 300;
+        // Calculate the initial scale factor to make the image 'cover' the 300x300 preview area
+        const initialScale = Math.max(targetDim / image.naturalWidth, targetDim / image.naturalHeight);
+
+        // Combine with the user's zoom factor ('scale') and the canvas resolution factor
+        const totalScaleFactor = initialScale * scale * (canvasSize / 300);
+
+        // Calculate drawing dimensions while preserving aspect ratio
+        const dWidth = image.naturalWidth * totalScaleFactor;
+        const dHeight = image.naturalHeight * totalScaleFactor;
+
+        // Calculate drawing position relative to the translated context center (0,0)
+        // The imgX/imgY (150-based) represents the *center* of the image in 300x300 space.
+        const centerShiftX = (imgX - 150) * (canvasSize / 300);
+        const centerShiftY = (imgY - 150) * (canvasSize / 300);
+        
+        const dX = -dWidth / 2 + centerShiftX;
+        const dY = -dHeight / 2 + centerShiftY;
+
+        context.drawImage(image, dX, dY, dWidth, dHeight);
+        // --- ASPECT RATIO FIX END ---
+
         context.restore();
       }
-
       // Draw selected flag if available
       if (currentFrame === "flag" && selectedFlag && selectedFlag.complete) {
-        const canvasSize = 300;
-
-        // Flag size and position
-        const targetHeight = 32;
-        const targetWidth = targetHeight * 1.5;
+        const targetHeight = 32 * (canvasSize / 300);
+        // Correctly calculate targetWidth to maintain the flag's aspect ratio
+        const targetWidth = targetHeight * (selectedFlag.width / selectedFlag.height); 
         const x = (canvasSize - targetWidth) / 2;
-        const y = canvasSize - targetHeight - 30;
-        const radius = 6;
-
-        const ctx = context; // alias for clarity
-
-        // Drop shadow
+        const y = canvasSize - targetHeight - 30 * (canvasSize / 300);
+        const radius = 6 * (canvasSize / 300);
+        const ctx = context;
         ctx.save();
         ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = 8 * (canvasSize / 300);
         ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 4;
-
-        // Clip to rounded rectangle
+        ctx.shadowOffsetY = 4 * (canvasSize / 300);
         ctx.beginPath();
         ctx.moveTo(x + radius, y);
         ctx.lineTo(x + targetWidth - radius, y);
@@ -439,16 +526,12 @@
         ctx.quadraticCurveTo(x, y, x + radius, y);
         ctx.closePath();
         ctx.clip();
-
-        // Draw flag
         ctx.drawImage(selectedFlag, x, y, targetWidth, targetHeight);
         ctx.restore();
       }
-
       if (currentFrame === "freepalestine") {
-        // Draw the frame overlay on top of the user image
         if (frame && frame.complete) {
-          context.drawImage(frame, 0, 0, 300, 300);
+          context.drawImage(frame, 0, 0, canvasSize, canvasSize);
         }
       }
     }
@@ -461,111 +544,21 @@
       setTimeout(() => (canvas.style.opacity = 1), 100);
     }
 
-    function drawEditCanvas() {
-      const editCanvas = document.getElementById("editCanvas");
-      const ctx = editCanvas.getContext("2d");
-      drawCanvas(ctx, userImg);
-    }
-
     function resetImage() {
       scale = 1;
       rotation = 0;
       imgX = 150;
       imgY = 150;
-      drawEditCanvas();
-    }
-
-    function applyChanges() {
       drawMainCanvas();
-      editorModal.close();
-      showOutputUI();
-    }
-
-    function showOutputUI() {
-      document.getElementById('inputSection').style.display = 'none';
-      document.getElementById('finalButtons').classList.remove('hidden');
-    }
-
-    function startOver() {
-      location.reload();
-    }
-
-    function backToEdit() {
-      editorModal.showModal();
-      document.getElementById("finalButtons").classList.add("hidden");
-      drawEditCanvas();
     }
 
     function downloadImage() {
-      // Get the selected resolution from the dropdown
-      const resolutionSelect = document.getElementById("resolutionSelect");
-      const size = parseInt(resolutionSelect.value, 10);
-      
-      // Create a new canvas in memory with the selected size
+      const size = selectedResolution;
       const highResCanvas = document.createElement("canvas");
       highResCanvas.width = size;
       highResCanvas.height = size;
       const highResCtx = highResCanvas.getContext("2d");
-
-      const scaleFactor = size / 300;
-
-      // Draw the frame onto the high-resolution canvas, scaled up
-      if (frame && frame.complete) {
-        highResCtx.drawImage(frame, 0, 0, size, size);
-      }
-
-      // Draw the user image with the new resolution and original transformations, all scaled up
-      if (userImg && userImg.complete && userImg.naturalWidth > 0) {
-        highResCtx.save();
-        highResCtx.beginPath();
-        highResCtx.arc(size / 2, size / 2, (size / 2) * 0.9, 0, Math.PI * 2);
-        highResCtx.closePath();
-        highResCtx.clip();
-        highResCtx.translate(size / 2, size / 2);
-        highResCtx.rotate(rotation);
-        const scaledImgSize = 300 * scale * scaleFactor;
-        highResCtx.drawImage(
-          userImg,
-          -scaledImgSize / 2 + (imgX - 150) * scaleFactor,
-          -scaledImgSize / 2 + (imgY - 150) * scaleFactor,
-          scaledImgSize,
-          scaledImgSize
-        );
-        highResCtx.restore();
-      }
-
-      // Draw the flag if applicable, also scaled up.
-      if (currentFrame === "flag" && selectedFlag && selectedFlag.complete) {
-        const targetHeight = 32 * scaleFactor;
-        const targetWidth = targetHeight * 1.5;
-        const x = (size - targetWidth) / 2;
-        const y = size - targetHeight - 30 * scaleFactor;
-        const radius = 6 * scaleFactor;
-
-        highResCtx.save();
-        highResCtx.shadowColor = "rgba(0, 0, 0, 0.3)";
-        highResCtx.shadowBlur = 8 * scaleFactor;
-        highResCtx.shadowOffsetX = 0;
-        highResCtx.shadowOffsetY = 4 * scaleFactor;
-
-        highResCtx.beginPath();
-        highResCtx.moveTo(x + radius, y);
-        highResCtx.lineTo(x + targetWidth - radius, y);
-        highResCtx.quadraticCurveTo(x + targetWidth, y, x + targetWidth, y + radius);
-        highResCtx.lineTo(x + targetWidth, y + targetHeight - radius);
-        highResCtx.quadraticCurveTo(x + targetWidth, y + targetHeight, x + targetWidth - radius, y + targetHeight);
-        highResCtx.lineTo(x + radius, y + targetHeight);
-        highResCtx.quadraticCurveTo(x, y + targetHeight, x, y + targetHeight - radius);
-        highResCtx.lineTo(x, y + radius);
-        highResCtx.quadraticCurveTo(x, y, x + radius, y);
-        highResCtx.closePath();
-        highResCtx.clip();
-
-        highResCtx.drawImage(selectedFlag, x, y, targetWidth, targetHeight);
-        highResCtx.restore();
-      }
-
-      // Trigger the download using the new high-resolution canvas.
+      drawCanvas(highResCtx, userImg, size);
       const link = document.createElement("a");
       link.download = `falastech-ppm_${size}x${size}.png`;
       link.href = highResCanvas.toDataURL("image/png");
@@ -591,90 +584,82 @@
       img.onload = () => {
         userImg = img;
         resetImage();
-        drawEditCanvas();
-        editorModal.showModal();
+        document.getElementById('step1').classList.add('hidden');
+        document.getElementById('step2').classList.remove('hidden');
+        document.getElementById('editControls').classList.remove('hidden');
+        document.getElementById('previewButton').classList.add('hidden');
+        document.getElementById('step3').classList.add('hidden');
       };
       img.onerror = () => {
-        alert("Unable to load the uploaded image.");
+        alert("Unable to load the image.");
       };
       img.src = src;
     }
 
     function zoom(factor) {
       scale *= factor;
-      drawEditCanvas();
+      drawMainCanvas();
     }
 
     function rotateImage() {
       rotation += Math.PI / 8;
-      drawEditCanvas();
+      drawMainCanvas();
     }
 
-    function loadFlagImage() {
-      if (!selectedCountry) return;
-
-      const code = {
-        palestine: "ps",
-        india: "in",
-        usa: "us",
-        egypt: "eg"
-      }[selectedCountry];
-
-      if (!code) return;
-
-      flagImg = new Image();
-      flagImg.crossOrigin = "anonymous";
-      flagImg.src = `https://flagcdn.com/w40/${code}.png`;
-
-      flagImg.onload = () => {
-        drawEditCanvas();
+    function loadFlag(country) {
+      if (!country) {
+        selectedFlag = null;
+        drawMainCanvas();
+        return;
+      }
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        selectedFlag = img;
         drawMainCanvas();
       };
+      img.onerror = () => {
+        alert("Flag failed to load.");
+        selectedFlag = null;
+      };
+      img.src = `https://flagcdn.com/w160/${country_code_map[country]}.png`;
     }
 
-    function changeFrame() {
-      const selectedValue = document.getElementById("frameSelect").value;
-
-      if (selectedValue === "bg-country.webp") {
-        setFrame("flag");
-        document.getElementById("countrySelectorContainer").classList.remove("hidden");
-
-      } else if (selectedValue === "bg-freepalestine.webp") {
-        setFrame("freepalestine");
-        document.getElementById("countrySelectorContainer").classList.add("hidden");
-        selectedFlag = null;
-        drawMainCanvas();
-
+    function changeFrame(type) {
+      ['default', 'flag', 'freepalestine'].forEach(frameType => {
+        document.getElementById(`frameBtn_${frameType}`).classList.remove('selected');
+      });
+      document.getElementById(`frameBtn_${type}`).classList.add('selected');
+      const countryContainer = document.getElementById("countrySelectorContainer");
+      if (type === 'flag') {
+        countryContainer.classList.remove('hidden');
       } else {
-        setFrame("default");
-        document.getElementById("countrySelectorContainer").classList.add("hidden");
+        countryContainer.classList.add('hidden');
         selectedFlag = null;
-        drawMainCanvas();
       }
+      setFrame(type);
+      document.getElementById('step3').classList.remove('hidden');
+    }
+
+    function selectResolution(res) {
+      selectedResolution = res;
+      document.querySelectorAll('.resolution-button').forEach(btn => btn.classList.remove('selected'));
+      document.getElementById(`resBtn_${res}`).classList.add('selected');
     }
 
     // Event Listeners
-    const upload = document.getElementById("upload");
-    upload.addEventListener("change", (e) => {
+    document.getElementById("upload").addEventListener("change", (e) => {
       const file = e.target.files[0];
-      if (!file) return;
-
-      const img = new Image();
-      img.onload = () => {
-        userImg = img;
-        resetImage();
-        drawEditCanvas();
-        editorModal.showModal();
-      };
-      img.src = URL.createObjectURL(file);
+      if (file) {
+        loadImage(URL.createObjectURL(file));
+      }
     });
 
-    const countrySelect = document.getElementById("countrySelect");
-    countrySelect.addEventListener("change", (e) => {
+    document.getElementById("countrySelect").addEventListener("change", (e) => {
       loadFlag(e.target.value);
     });
 
-    const editCanvas = document.getElementById("editCanvas");
+    const canvas = document.getElementById("canvas");
 
     function handleDragStart(x, y) {
       startX = x;
@@ -684,93 +669,45 @@
 
     function handleDragMove(x, y) {
       if (!isDragging || !userImg) return;
-
       const dx = x - startX;
       const dy = y - startY;
-
-      imgX = Math.min(Math.max(imgX + dx, 50), 250);
-      imgY = Math.min(Math.max(imgY + dy, 50), 250);
-
+      imgX = imgX + dx;
+      imgY = imgY + dy;
       startX = x;
       startY = y;
-      drawEditCanvas();
+      drawMainCanvas();
     }
-
-    editCanvas.addEventListener("mousedown", (e) => {
+    canvas.addEventListener("mousedown", (e) => {
       handleDragStart(e.offsetX, e.offsetY);
     });
-    editCanvas.addEventListener("mousemove", (e) => {
+    canvas.addEventListener("mousemove", (e) => {
       handleDragMove(e.offsetX, e.offsetY);
     });
-    editCanvas.addEventListener("mouseup", () => isDragging = false);
-    editCanvas.addEventListener("mouseleave", () => isDragging = false);
-
-    editCanvas.addEventListener("touchstart", (e) => {
+    canvas.addEventListener("mouseup", () => isDragging = false);
+    canvas.addEventListener("mouseleave", () => isDragging = false);
+    canvas.addEventListener("touchstart", (e) => {
       const touch = e.touches[0];
-      const rect = editCanvas.getBoundingClientRect();
+      const rect = canvas.getBoundingClientRect();
       handleDragStart(touch.clientX - rect.left, touch.clientY - rect.top);
     });
-    editCanvas.addEventListener("touchmove", (e) => {
+    canvas.addEventListener("touchmove", (e) => {
       e.preventDefault();
       const touch = e.touches[0];
-      const rect = editCanvas.getBoundingClientRect();
+      const rect = canvas.getBoundingClientRect();
       handleDragMove(touch.clientX - rect.left, touch.clientY - rect.top);
     });
-    editCanvas.addEventListener("touchend", () => isDragging = false);
+    canvas.addEventListener("touchend", () => isDragging = false);
 
     // Buttons
     document.getElementById("themeButton").addEventListener("click", toggleDarkMode);
-    document.getElementById("previewButton").addEventListener("click", drawMainCanvas);
     document.getElementById("zoomInBtn").addEventListener("click", () => zoom(1.1));
     document.getElementById("zoomOutBtn").addEventListener("click", () => zoom(0.9));
     document.getElementById("rotateBtn").addEventListener("click", rotateImage);
     document.getElementById("resetBtn").addEventListener("click", resetImage);
-    document.getElementById("applyBtn").addEventListener("click", applyChanges);
     document.getElementById("downloadBtn").addEventListener("click", downloadImage);
-    document.getElementById("backEditBtn").addEventListener("click", backToEdit);
-    document.getElementById("startOverBtn").addEventListener("click", startOver);
-
-    let selectedFlag = null;
-
-
-    function loadFlag(country) {
-      if (!country) {
-        selectedFlag = null;
-        drawMainCanvas();
-        drawEditCanvas();
-        return;
-      }
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        selectedFlag = img;
-        drawMainCanvas();
-        drawEditCanvas();
-      };
-      img.onerror = () => {
-        alert("Flag failed to load.");
-        selectedFlag = null;
-      };
-      img.src = flagPaths[country];
-    }
-
-    // Draw selected flag if available
-    if (selectedFlag && selectedFlag.complete) {
-      const canvasSize = 300;
-
-      const aspectRatio = selectedFlag.width / selectedFlag.height;
-
-      const targetHeight = 40;
-      const targetWidth = targetHeight * aspectRatio;
-
-      const x = (canvasSize - targetWidth) / 2;
-      const y = canvasSize - targetHeight - 30;
-
-      context.drawImage(selectedFlag, x, y, targetWidth, targetHeight);
-    }
 
     // Initial Setup
-    setFrame("default");
+    setFrame('default');
     lucide.createIcons();
 
     // Load an example image
@@ -792,23 +729,7 @@
     if (inAppBrowser) {
       document.getElementById("browserWarning").classList.remove("hidden");
     }
-
-    function loadImage(src) {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        userImg = img;
-        resetImage();
-        drawEditCanvas();
-        editorModal.showModal();
-      };
-      img.onerror = () => {
-        alert("Unable to load the uploaded image.");
-      };
-      img.src = src;
-    }
   </script>
-  <script src="flagPaths.js"></script>
 </body>
 
 </html>
