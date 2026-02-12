@@ -1,61 +1,56 @@
-[![Code for Liberation](https://img.shields.io/badge/🇵🇸%20Code_for_Liberation-falastech.org-%23E60023.svg)](https://falastech.org)
+[![FalasTech](https://img.shields.io/badge/FalasTech-falastech.org-%23E60023.svg)](https://falastech.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey.svg)](https://github.com/FalasTech/falastech-website/blob/main/LICENSE)
 
-# 🇵🇸 Palestine Profile Pic Maker
+# Palestine Profile Maker
 
-🚨 **LAUNCH ALERT:** The Palestine Profile Pic Maker is now live!  
-✊🏽 Show your support — frame your profile picture in solidarity.  
-🇵🇸 No logins. No tracking. Just resistance.
+A lightweight web tool for generating profile images with Palestine support frames.
 
----
-
-## 🌐 Live
-
-Try it now: [https://ppm.falastech.org](https://ppm.falastech.org)
+This project is part of **FalasTech**, an independent initiative building privacy-respecting web tools for public use and digital advocacy.
 
 ---
 
-## ✨ Features
+## Live
 
-- Choose from 3 powerful frame styles:  
-  • Classic Palestine Flag  
-  • With Your Country Flag 🌍  
-  • #FreePalestine Overlay  
-- Upload your photo or fetch from GitHub, GitLab, or X (Twitter)  
-- Zoom, rotate, and reposition your image easily  
-- Download your custom profile picture in one click  
-- Fully browser-based, no data stored
+https://ppm.falastech.org
 
 ---
 
-## 🛠️ Built With
+## Features
 
-- HTML/CSS/JavaScript  
-- [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)  
-- Lightweight, framework-free UI  
-
----
-
-## 👤 Developed By
-
-- [@heyitzamjad](https://github.com/heyitzamjad)  
-- Part of the [FalasTech](https://falastech.org/) community  
+- Three frame options:
+  - Palestine flag frame
+  - Country + Palestine combination
+  - #FreePalestine overlay
+- Upload an image or fetch from supported platforms
+- Adjust position, zoom, and rotation
+- Download the final image instantly
+- Fully browser-based — no images are uploaded or stored
 
 ---
 
-## 📄 License
+## Privacy
 
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-## 🙌 Contributing
-
-Pull requests, issues, and suggestions are welcome! Help spread the message and improve the tool.
+All image processing happens locally in the browser.  
+No user data or photos are collected or stored.
 
 ---
 
-## 📢 Social
+## Built With
 
-Built with 💚 by [FalasTech](https://github.com/FalasTech) — Free & open-source ✊  
-#FreePalestine #DigitalActivism #OpenSource #FalasTech #ProfilePicForPalestine
+- HTML, CSS, JavaScript  
+- Canvas API  
+- Framework-free implementation
+
+---
+
+## Contributing
+
+Contributions, bug reports, and suggestions are welcome.
+
+Please open an issue first to discuss major changes before submitting a pull request.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
