@@ -69,7 +69,6 @@
 
     .frame-thumbnail.selected {
       border-color: #EF4444;
-      /* Tailwind's `red-500` */
     }
 
     .resolution-button.selected {
@@ -90,7 +89,7 @@
       </h1>
       <button id="themeButton"
         class="text-sm p-2 rounded-full bg-gray-200 dark:bg-gray-700 dark:text-white flex items-center justify-center">
-        <i id="themeIcon" data-lucide="sun" class="w-5 h-5 icon-transition"></i>
+        <i id="themeIcon" data-lucide="sun" aria-label="Toggle Dark Mode" class="w-5 h-5 icon-transition"></i>
       </button>
     </div>
   </header>
@@ -145,19 +144,17 @@
 
             <button onClick="fetchAvatar('x')"
               class="flex flex-col items-center justify-center p-6 rounded-2xl bg-black text-white hover:bg-gray-800 transition">
-              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" class="h-8 w-8 filter invert mb-2">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" alt="X (Twitter) Logo" class="h-8 w-8 filter invert mb-2">
               <span class="text-sm font-semibold">X (Twitter)</span>
             </button>
             <button onClick="fetchAvatar('github')"
               class="flex flex-col items-center justify-center p-6 rounded-2xl bg-gray-800 text-white hover:bg-gray-700 transition">
-              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg"
-                class="h-8 w-8 filter invert mb-2">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg" alt="GitHub Logo" class="h-8 w-8 filter invert mb-2">
               <span class="text-sm font-semibold">GitHub</span>
             </button>
             <button onClick="fetchAvatar('gitlab')"
               class="flex flex-col items-center justify-center p-6 rounded-2xl bg-red-600 text-white hover:bg-red-700 transition">
-              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gitlab.svg"
-                class="h-8 w-8 filter invert mb-2">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gitlab.svg" alt="GitLab Logo" class="h-8 w-8 filter invert mb-2">
               <span class="text-sm font-semibold">GitLab</span>
             </button>
           </div>
