@@ -11,7 +11,7 @@ This project is part of **FalasTech**, an independent initiative building privac
 
 ## Live
 
-https://ppm.falastech.org
+https://ppm.falastech.is-a.dev
 
 ---
 
